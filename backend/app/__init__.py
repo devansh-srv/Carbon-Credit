@@ -23,17 +23,13 @@ def create_app():
     from .routes.auth_routes import auth_bp
     from .routes.admin_routes import admin_bp
     from .routes.buyer_routes import buyer_bp
-    from .routes.health_routes import health_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(buyer_bp)
-    app.register_blueprint(health_bp)
     
     with app.app_context():
         db.create_all()
         print("Connected to NeonPostgresql !")
-
-    # print(app.url_map)
-
+    
     return app
