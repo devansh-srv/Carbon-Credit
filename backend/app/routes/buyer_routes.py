@@ -4,6 +4,7 @@ from app.models.user import User
 from app.models.credit import Credit
 from app.models.transaction import PurchasedCredit
 from app.models.transaction import Transactions
+from app.utilis.redis import get_redis
 from app.utilis.certificate_generator import generate_certificate_data
 import json
 import io
@@ -21,8 +22,27 @@ def get_current_user():
 @buyer_bp.route('/api/buyer/credits', methods=['GET'])
 @jwt_required()
 def buyer_credits():
+    key = "buyer_credits"
+    redis_client = get_redis()
+    if redis_client:
+        try:
+            cached_credits = redis_client.get(key)
+            if cached_credits:
+                print("cache hit")
+                return jsonify(json.loads(cached_credits))
+            else:
+                print("cache miss")
+        except Exception as e:
+            print(f"redis get client error: {e}")
     credits = Credit.query.filter_by(is_active =True).all()
-    return jsonify([{"id": c.id, "name": c.name, "amount": c.amount, "price": c.price,"creator":c.creator_id} for c in credits])
+    credits_data = [{"id": c.id, "name": c.name, "amount": c.amount, "price": c.price,"creator":c.creator_id} for c in credits]
+    if redis_client:
+        try:
+            redis_client.setex(key,600,json.dumps(credits_data))
+            print("redis successful")
+        except Exception as e:
+            print(f"redis error: {e}")
+    return jsonify(credits_data)
 
 @buyer_bp.route('/api/buyer/purchase', methods=['POST'])
 @jwt_required()
