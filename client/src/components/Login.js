@@ -77,7 +77,7 @@ const Login = ({ onLogin }) => {
             <button
               className="py-1 px-3 text-white bg-emerald-600 rounded-md"
               onClick={() => {
-                setFormData({ username: "test_NGO", password: "sepolia", role: "NGO" });
+                setFormData({ username: "test_admin", password: "sepolia", role: "NGO" });
                 setShowTestPrompt(false);
               }}
             >
