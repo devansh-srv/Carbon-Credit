@@ -3,7 +3,16 @@ import { getNGOCredits, createNGOCredit, getTransactions, expireCreditApi, verif
 import { CC_Context } from "../context/SmartContractConnector.js";
 import Swal from 'sweetalert2';
 import { Loader2 } from 'lucide-react';
+import { useDropzone } from 'react-dropzone'
+import { Cloudinary } from '@cloudinary/url-gen';
 
+const cloud = new Cloudinary({
+  cloud: {
+    cloudName: process.env.REACT_APP_CLOUD_NAME,
+    apiKey: process.env.REACT_APP_CLOUD_API_KEY,
+    apiSecret: process.env.REACT_APP_CLOUD_API_SECRET
+  },
+})
 
 const LoadingCredit = () => (
   <li className="flex justify-between items-center py-3 pr-4 pl-3 text-sm animate-pulse">
@@ -216,6 +225,55 @@ const NGODashboard = () => {
     fetchData();
   }, []);
 
+  const onDrop = async (acceptedFiles) => {
+    // Handle the dropped files
+
+    const file = acceptedFiles[0];
+    if (file && file.type === "application/pdf") {
+      setSelectedFile(file);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'CARBON')
+      try {
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        console.log('File uploaded to Cloudinary: ', data);
+        Swal.fire({
+          icon: "success",
+          title: "File Uploaded",
+          text: "Your file has been uploaded successfully.",
+        });
+      }
+      catch (err) {
+        console.error('Failed uploading file to cloudinary: ', err);
+        Swal.fire(
+          {
+            icon: "error",
+            title: "Upload failed",
+            text: "There was an error uploading your file. Please try again.",
+          }
+        )
+      }
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: "Invalid File",
+        text: "Please upload a valid PDF file.",
+      });
+    }
+  };
+
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+    onDrop,
+    accept: "application/pdf",
+    maxFiles: 1,
+    noClick: false,
+    noKeyboard: false,
+  });
+
   return (
     <div className="overflow-hidden bg-white bg-gradient-to-br from-emerald-200 to-blue-100 shadow sm:rounded-lg">
       <div className="py-5 px-4 sm:px-6">
@@ -328,6 +386,25 @@ const NGODashboard = () => {
         </dd>
       </div>
 
+      <div className="py-5 px-4 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dt className="text-sm font-medium text-gray-500">Upload Project PDF</dt>
+        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+          <div {...getRootProps()} className="p-6 text-center border-2 border-gray-400 border-dashed">
+            <input {...getInputProps()} />
+            {
+              isDragActive ? (
+                <>
+                  <p>Drop the files here ...</p>
+                </>) : (
+                <>
+                  <p>Drag 'n' drop a PDF file here, or click to select one</p>
+                  <button type='button' onClick={open} className="py-2 px-4 font-sans text-black bg-gray-200 rounded hover:bg-gray-100">Upload Project File</button>
+                </>
+              )
+            }
+          </div>
+        </dd>
+      </div>
 
       {modalVisible && (
         <div className="flex fixed inset-0 z-50 justify-center items-center bg-gray-800 bg-opacity-75">

@@ -3,9 +3,11 @@ import { Route, Routes, Navigate, Link, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import NGOSignup from './components/NGOSignup';
 import BuyerSignup from './components/BuyerSignup';
+import AuditorSignup from './components/AuditorSignup';
 import Login from './components/Login';
 import NGODashboard from './components/NGODashboard';
 import BuyerDashboard from './components/BuyerDashboard';
+import AuditorDashboard from './components/AuditorDashboard'
 import TestPage from './components/testPage';
 import Home from './components/Home';
 import { SpeedInsights } from '@vercel/speed-insights/react';
@@ -51,7 +53,7 @@ const App = () => {
           // console.log(currentPath);
           // navigate(currentPath);
           if (window.location.pathname === '/' || window.location.pathname === '/login') {
-            navigate(parsedSub.role === 'NGO' ? '/NGO-dashboard' : '/buyer-dashboard');
+            navigate(parsedSub.role.toLowerCase() === 'ngo' ? '/NGO-dashboard' : parsedSub.role.toLowerCase() === 'auditor' ? '/auditor-dashboard' : '/buyer-dashboard');
           }
 
         }
@@ -81,6 +83,7 @@ const App = () => {
             <Route path="/home" element={<Home />} />
             <Route path="/NGO-signup" element={<NGOSignup onLogin={handleLogin} />} />
             <Route path="/buyer-signup" element={<BuyerSignup onLogin={handleLogin} />} />
+            <Route path="/auditor-signup" element={<AuditorSignup onLogin={handleLogin} />} />
             <Route path="/login" element={<Login onLogin={handleLogin} />} />
             <Route path="/test" element={<TestPage />} />
             <Route
@@ -99,9 +102,17 @@ const App = () => {
                   <Navigate to="/login" replace />
               }
             />
+            <Route
+              path="/auditor-dashboard"
+              element={
+                user && user.role === 'auditor' ?
+                  <AuditorDashboard onLogout={handleLogout} /> :
+                  <Navigate to="/login" replace />
+              }
+            />
             <Route path="/" element={
               user ?
-                user.role === 'NGO' ? <Navigate to="/NGO-dashboard" replace /> : <Navigate to="/buyer-dashboard" replace />
+                user.role === 'NGO' ? <Navigate to="/NGO-dashboard" replace /> : user.role === 'auditor' ? <Navigate to="/auditor-dashboard" /> : <Navigate to="/buyer-dashboard" replace />
 
                 : <Navigate to="/home" replace />}
             />

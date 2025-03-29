@@ -33,6 +33,12 @@ const Navbar = ({ user, onLogout }) => {
               >
                 Buyer Signup
               </Link>
+              <Link
+                to="/auditor-signup"
+                className="text-emerald-700 transition hover:text-emerald-900"
+              >
+                Auditor Signup
+              </Link>
             </>
           )}
           {user &&
