@@ -5,24 +5,24 @@ from app.models.credit import Credit
 from app.models.transaction import PurchasedCredit, Transactions
 from app.models.user import User
 import json
-admin_bp = Blueprint('admin', __name__)
+NGO_bp = Blueprint('NGO', __name__)
 def get_current_user():
     try:
         return json.loads(get_jwt_identity())
     except json.JSONDecodeError:
         return None
-@admin_bp.route('/api/admin/credits', methods=['GET', 'POST'])
+@NGO_bp.route('/api/NGO/credits', methods=['GET', 'POST'])
 @jwt_required()
 
 
 def manage_credits():
     current_user = get_current_user()
-    if current_user.get('role') != 'admin':
+    if current_user.get('role') != 'NGO':
         return jsonify({"message": "Unauthorized"}), 403
 
     user = User.query.filter_by(username=current_user.get('username')).first()
 
-    # Ensure only credits created by this admin are visible
+    # Ensure only credits created by this NGO are visible
     if request.method == 'GET':
         credits = Credit.query.filter_by(creator_id=user.id).all()
         return jsonify([{
@@ -35,7 +35,7 @@ def manage_credits():
             "creator_id": c.creator_id
         } for c in credits]), 200
 
-    # Allow the admin to create new credits
+    # Allow the NGO to create new credits
     if request.method == 'POST':
         data = request.json
         new_credit = Credit(
@@ -50,11 +50,11 @@ def manage_credits():
         return jsonify({"message": "Credit created successfully"}), 201
 
 
-@admin_bp.route('/api/admin/credits/expire/<int:credit_id>', methods=['PATCH'])
+@NGO_bp.route('/api/NGO/credits/expire/<int:credit_id>', methods=['PATCH'])
 @jwt_required()
 def expire_credit(credit_id):
     current_user = get_current_user()
-    if current_user.get('role') != 'admin':
+    if current_user.get('role') != 'NGO':
         return jsonify({"message": "Unauthorized"}), 403
 
     user = User.query.filter_by(username=current_user.get('username')).first()
@@ -65,7 +65,7 @@ def expire_credit(credit_id):
         return jsonify({"message": "Credit not found"}), 404
     if not pc:
         return jsonify({"message": f"Credit can't be expired as it has not been sold yet, credit with B_ID {credit_id} is not found"}), 400
-    # Ensure only the creator admin can expire the credit
+    # Ensure only the creator NGO can expire the credit
     if credit.creator_id != user.id:
         return jsonify({"message": "You do not have permission to expire this credit"}), 403
 
@@ -76,11 +76,11 @@ def expire_credit(credit_id):
     db.session.commit()
     return jsonify({"message": "Credit expired successfully"}), 200
 
-@admin_bp.route('/api/admin/transactions', methods=['GET'])
+@NGO_bp.route('/api/NGO/transactions', methods=['GET'])
 @jwt_required()
 def get_transactions():
     current_user = get_current_user()
-    if current_user.get('role') != 'admin':
+    if current_user.get('role') != 'NGO':
         return jsonify({"message": "Unauthorized"}), 403
 
     transactions = Transactions.query.order_by(Transactions.timestamp.desc()).all()
@@ -97,13 +97,13 @@ def get_transactions():
     return jsonify(transaction_list)
 
 
-@admin_bp.route('/api/admin/expire-req', methods=['POST'])
+@NGO_bp.route('/api/NGO/expire-req', methods=['POST'])
 @jwt_required()
 def check_request():
     data = request.json
 
     current_user = get_current_user()
-    if current_user.get('role') != 'admin':
+    if current_user.get('role') != 'NGO':
         return jsonify({"message": "Unauthorized"}), 403
 
     username = current_user.get('username')

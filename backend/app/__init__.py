@@ -21,12 +21,12 @@ def create_app():
     
     # Register blueprints
     from .routes.auth_routes import auth_bp
-    from .routes.admin_routes import admin_bp
+    from .routes.NGO_routes import NGO_bp
     from .routes.buyer_routes import buyer_bp
     from .routes.health_routes import health_bp
     
     app.register_blueprint(auth_bp)
-    app.register_blueprint(admin_bp)
+    app.register_blueprint(NGO_bp)
     app.register_blueprint(buyer_bp)
     app.register_blueprint(health_bp)
     
