@@ -41,8 +41,7 @@ const AuditorSignup = ({ onLogin }) => {
 
       onLogin({ username: formData.username, role: 'Auditor' });
 
-      navigate('/Auditor-dashboard');
-
+      navigate('/auditor-dashboard');
     } catch (error) {
       setLoadStatus(false);
       if (error.status === 400) {
