@@ -10,7 +10,7 @@ const BuyerSignup = ({ onLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState(null)
   const [color, setColor] = useState(null)
-  const [loadStatus, setLoadSatus] = useState(false);
+  const [loadStatus, setLoadStatus] = useState(false);
   const navigate = useNavigate();
   const SITE_KEY = process.env.REACT_APP_SITE_KEY || '1x00000000000000000000AA';
   const handleChange = (e) => {
@@ -25,7 +25,7 @@ const BuyerSignup = ({ onLogin }) => {
     e.preventDefault();
     try {
       // console.log("FormData:", formData);
-      setLoadSatus(true);
+      setLoadStatus(true);
       const signupResponse = await signup({ ...formData, role: 'buyer', 'cf-turnstile-response': captchaToken });
       setStatus(signupResponse.data.message)
       setColor('bg-indigo-700')
@@ -41,12 +41,12 @@ const BuyerSignup = ({ onLogin }) => {
       navigate('/buyer-dashboard');
 
     } catch (error) {
-      setLoadSatus(false);
+      setLoadStatus(false);
       if (error.status === 400) { alert(error?.response?.data?.message) } else {
         console.error('Signup failed:', error);
         setStatus('Signup Failed. Please Try Again')
         setColor('bg-red-500')
-        
+
         setInterval(() => {
           setStatus(null)
           setColor(null)
@@ -137,7 +137,7 @@ const BuyerSignup = ({ onLogin }) => {
                 className="py-2 px-4 w-full font-semibold text-white bg-blue-600 rounded-lg transition-colors duration-300 hover:bg-blue-700"
                 type="submit"
               >
-                {loadStatus? "Loading...": "Sign Up" }
+                {loadStatus ? "Loading..." : "Sign Up"}
               </button>
             </div>
           </form>

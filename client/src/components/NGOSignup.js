@@ -4,13 +4,13 @@ import { Turnstile } from '@marsidev/react-turnstile';
 import { useNavigate } from 'react-router-dom';
 
 
-const AdminSignup = ({ onLogin }) => {
+const NGOSignup = ({ onLogin }) => {
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [captchaToken, setCaptchaToken] = useState('');
   const [status, setStatus] = useState(null)
   const [color, setColor] = useState(null)
   const [showPassword, setShowPassword] = useState(false);
-  const [loadStatus, setLoadSatus] = useState(false);
+  const [loadStatus, setLoadStatus] = useState(false);
   const SITE_KEY = process.env.REACT_APP_SITE_KEY || '1x00000000000000000000AA';
   const navigate = useNavigate();
 
@@ -26,8 +26,8 @@ const AdminSignup = ({ onLogin }) => {
     e.preventDefault();
     try {
       // console.log("FormData:", formData);
-      setLoadSatus(true);
-      const signupResponse = await signup({ ...formData, role: 'admin', 'cf-turnstile-response': captchaToken });
+      setLoadStatus(true);
+      const signupResponse = await signup({ ...formData, role: 'NGO', 'cf-turnstile-response': captchaToken });
 
       setStatus(signupResponse.data.message)
       setColor('bg-emerald-700')
@@ -35,23 +35,23 @@ const AdminSignup = ({ onLogin }) => {
         setStatus(null)
         setColor(null)
       }, 3000)
-      const loginResponse = await login({ ...formData, role: 'admin', 'cf-turnstile-response': captchaToken });
+      const loginResponse = await login({ ...formData, role: 'NGO', 'cf-turnstile-response': captchaToken });
 
       localStorage.setItem("token", loginResponse.data.access_token);
 
-      onLogin({ username: formData.username, role: 'admin' });
+      onLogin({ username: formData.username, role: 'NGO' });
 
-      navigate('/admin-dashboard');
+      navigate('/NGO-dashboard');
 
     } catch (error) {
-      setLoadSatus(false);
+      setLoadStatus(false);
       if (error.status === 400) {
         alert(error?.response?.data?.message)
       } else {
         console.error('Signup failed:', error);
         setStatus('Signup Failed. Please Try Again')
         setColor('bg-red-500')
-        
+
         setInterval(() => {
           setStatus(null)
           setColor(null)
@@ -72,8 +72,8 @@ const AdminSignup = ({ onLogin }) => {
       }
       <div className="w-full max-w-md rounded-xl shadow-xl bg-white/90 backdrop-blur-sm">
         <div className="p-8">
-          <div className="mb-1 text-sm font-semibold tracking-wide text-emerald-700 uppercase">Admin Registration</div>
-          <h2 className="block mt-1 text-2xl font-medium leading-tight text-emerald-900">Create an admin account</h2>
+          <div className="mb-1 text-sm font-semibold tracking-wide text-emerald-700 uppercase">NGO Registration</div>
+          <h2 className="block mt-1 text-2xl font-medium leading-tight text-emerald-900">Create an NGO account</h2>
           <form onSubmit={handleSubmit} className="mt-6 space-y-6">
             <div>
               <label className="block mb-2 text-sm font-medium text-emerald-800" htmlFor="username">
@@ -141,7 +141,7 @@ const AdminSignup = ({ onLogin }) => {
                 className="py-2 px-4 w-full font-semibold text-white bg-emerald-700 rounded-lg transition-colors duration-300 hover:bg-emerald-800"
                 type="submit"
               >
-                {loadStatus? "Loading...": "Sign Up" }
+                {loadStatus ? "Loading..." : "Sign Up"}
               </button>
             </div>
           </form>
@@ -151,4 +151,4 @@ const AdminSignup = ({ onLogin }) => {
   );
 };
 
-export default AdminSignup;
+export default NGOSignup;

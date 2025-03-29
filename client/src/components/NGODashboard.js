@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { getAdminCredits, createAdminCredit, getTransactions, expireCreditApi, verifyBeforeExpire } from '../api/api';
+import { getNGOCredits, createNGOCredit, getTransactions, expireCreditApi, verifyBeforeExpire } from '../api/api';
 import { CC_Context } from "../context/SmartContractConnector.js";
 import Swal from 'sweetalert2';
 import { Loader2 } from 'lucide-react';
@@ -8,7 +8,7 @@ import { Loader2 } from 'lucide-react';
 const LoadingCredit = () => (
   <li className="flex justify-between items-center py-3 pr-4 pl-3 text-sm animate-pulse">
     <div className="flex-1">
-      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+      <div className="w-3/4 h-4 bg-gray-200 rounded"></div>
     </div>
     <div className="w-16">
       <div className="h-8 bg-gray-200 rounded"></div>
@@ -16,11 +16,11 @@ const LoadingCredit = () => (
   </li>
 );
 
-const AdminDashboard = () => {
+const NGODashboard = () => {
 
-  const { 
-    connectWallet, 
-    generateCredit, 
+  const {
+    connectWallet,
+    generateCredit,
     getNextCreditId,
     expireCredit
   } = useContext(CC_Context);
@@ -43,50 +43,50 @@ const AdminDashboard = () => {
     const fetchCredits = async () => {
       try {
         setIsLoading(true);
-        const response = await getAdminCredits();
+        const response = await getNGOCredits();
         setMyCredits(response.data);
       } catch (error) {
         console.error('Failed to fetch credits:', error);
-      }finally{
+      } finally {
         setIsLoading(false);
       }
     };
     fetchCredits();
   }, []);
 
-  const [newCredit, setNewCredit] = useState({creditId:0, name: '', amount: '', price: '' });
+  const [newCredit, setNewCredit] = useState({ creditId: 0, name: '', amount: '', price: '' });
 
   const handleCreateCredit = async (e) => {
     e.preventDefault();
-  
+
     if (!newCredit.name || !newCredit.amount || !newCredit.price) {
       alert("Please fill in all fields!");
       return;
     }
-  
+
     try {
       setPendingCr(true);
       const newCreditId = await getNextCreditId(); // Resolve the promise
       console.log("Resolved newCredit ID:", newCreditId);
-  
+
       const updatedCredit = { ...newCredit, creditId: Number(newCreditId) }; // Update with the resolved ID
       console.log("Updated Credit Object:", updatedCredit);
-  
+
       await generateCredit(updatedCredit.amount, updatedCredit.price); // Use updated credit here
-      const response = await createAdminCredit(updatedCredit);
-  
+      const response = await createNGOCredit(updatedCredit);
+
       // Refetch the updated credit list after successful creation
-      const updatedCredits = await getAdminCredits();
+      const updatedCredits = await getNGOCredits();
       setMyCredits(updatedCredits.data);
-  
+
       setNewCredit({ name: "", amount: 0, price: 0, creditId: 0 });
     } catch (error) {
       console.error("Failed to create credit:", error);
-    } finally{
+    } finally {
       setPendingCr(false);
     }
   };
-  
+
 
   const handleInputChange = (e) => {
     setNewCredit({ ...newCredit, [e.target.name]: e.target.value });
@@ -122,7 +122,7 @@ const AdminDashboard = () => {
   };
 
   const handleSubmitRequest = async () => {
-    
+
     try {
       const { creditName, amountReduced, password } = expirationData;
 
@@ -135,7 +135,7 @@ const AdminDashboard = () => {
         return;
       }
 
-      if (creditName != selectedCredit.name){
+      if (creditName != selectedCredit.name) {
         Swal.fire({
           icon: "warning",
           title: "Name Error",
@@ -161,22 +161,22 @@ const AdminDashboard = () => {
   const handleExpireCredit = async (creditId) => {
     console.log(`Expire credit called for credit ID: ${creditId}`);
     const SC_Credit_Id = creditId;
-  
+
     try {
       setPendingTx(creditId);
       const response = await expireCreditApi(creditId);
       console.log(response.data);
-  
+
       // Call the smart contract function
       await expireCredit(SC_Credit_Id);
-  
+
       // SweetAlert for success
       Swal.fire({
         icon: 'success',
         title: 'Success',
         text: 'Credit expired successfully!',
       });
-  
+
       setMyCredits((prevCredits) =>
         prevCredits.map((credit) =>
           credit.id === creditId ? { ...credit, is_expired: true } : credit
@@ -193,18 +193,18 @@ const AdminDashboard = () => {
       } else {
         console.error('Failed to expire credit:', error);
       }
-    } finally{
+    } finally {
       setPendingTx(null);
     }
   };
-  
+
 
   const [transactions, setTransactions] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [creditsResponse, transactionsResponse] = await Promise.all([
-          getAdminCredits(),
+          getNGOCredits(),
           getTransactions()
         ]);
         setMyCredits(creditsResponse.data);
@@ -215,18 +215,18 @@ const AdminDashboard = () => {
     };
     fetchData();
   }, []);
-  
+
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg bg-gradient-to-br from-emerald-200 to-blue-100">
-      <div className="px-4 py-5 sm:px-6">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">Admin Dashboard</h3>
+    <div className="overflow-hidden bg-white bg-gradient-to-br from-emerald-200 to-blue-100 shadow sm:rounded-lg">
+      <div className="py-5 px-4 sm:px-6">
+        <h3 className="text-lg font-medium leading-6 text-gray-900">NGO Dashboard</h3>
         <p className="mt-1 max-w-2xl text-sm text-gray-500">Manage your carbon credits</p>
       </div>
       <div className="border-t border-gray-200">
         <dl>
-          <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div className="py-5 px-4 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">Create New Credit</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               <form onSubmit={handleCreateCredit} className="space-y-4">
                 <input
                   className="input"
@@ -255,70 +255,70 @@ const AdminDashboard = () => {
                   onChange={handleInputChange}
                   required
                 />
-                <button type="submit" className="btn btn-primary">{pendingCr? <span className='flex'>
-                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                        Generating Credit... 
-                                        </span>
-                                        : "Create Credit"}</button>
+                <button type="submit" className="btn btn-primary">{pendingCr ? <span className='flex'>
+                  <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                  Generating Credit...
+                </span>
+                  : "Create Credit"}</button>
               </form>
             </dd>
           </div>
-          <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div className="py-5 px-4 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">My Credits</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
-              {isLoading ? (
+            <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+              <ul className="rounded-md border border-gray-200 divide-y divide-gray-200">
+                {isLoading ? (
                   <>
                     <LoadingCredit />
                     <LoadingCredit />
                     <LoadingCredit />
                   </>
-                ): myCredits.map((credit) => (
-              <li 
-                key={credit.id} 
-                className="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
-                  style={{ backgroundColor: credit.is_expired ? '#D4EDDA' : 'transparent' }} // Replace with your green hex
-                >
-                  <div className="w-0 flex-1 flex items-center">
-                    <span className="ml-2 flex-1 w-0 truncate">
-                      {credit.id}: {credit.name} - Amount: {credit.amount}, Price: {credit.price} ETH
-                    </span>
-                  </div>
-                {!credit.is_expired ? (
-                  <button
-                  onClick={() => openModal(credit)}
-                  className="ml-4 px-3 py-1 text-white rounded hover:opacity-90"
-                  style={{ backgroundColor: "#415e02" }}
-                >
-                    {pendingTx===credit.id? <span className='flex'>
-                                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                                Processing...
-                                              </span>
-                                              :'Expire Credit'}
-                </button>
-                ): <span className='text-emerald-900'>Expired !</span>}
-              </li>
-            ))}
+                ) : myCredits.map((credit) => (
+                  <li
+                    key={credit.id}
+                    className="flex justify-between items-center py-3 pr-4 pl-3 text-sm"
+                    style={{ backgroundColor: credit.is_expired ? '#D4EDDA' : 'transparent' }} // Replace with your green hex
+                  >
+                    <div className="flex flex-1 items-center w-0">
+                      <span className="flex-1 ml-2 w-0 truncate">
+                        {credit.id}: {credit.name} - Amount: {credit.amount}, Price: {credit.price} ETH
+                      </span>
+                    </div>
+                    {!credit.is_expired ? (
+                      <button
+                        onClick={() => openModal(credit)}
+                        className="py-1 px-3 ml-4 text-white rounded hover:opacity-90"
+                        style={{ backgroundColor: "#415e02" }}
+                      >
+                        {pendingTx === credit.id ? <span className='flex'>
+                          <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                          Processing...
+                        </span>
+                          : 'Expire Credit'}
+                      </button>
+                    ) : <span className='text-emerald-900'>Expired !</span>}
+                  </li>
+                ))}
               </ul>
             </dd>
           </div>
         </dl>
       </div>
 
-      <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+      <div className="py-5 px-4 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
         <dt className="text-sm font-medium text-gray-500">Recent Transactions</dt>
-        <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-          <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
+        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+          <ul className="rounded-md border border-gray-200 divide-y divide-gray-200">
             {isLoading ? (
-                  <>
-                    <LoadingCredit />
-                    <LoadingCredit />
-                    <LoadingCredit />
-                  </>
-                ): transactions.slice(-10).map((transaction) => (
-              <li key={transaction.id} className="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
-                <div className="w-0 flex-1 flex items-center">
-                  <span className="ml-2 flex-1 w-0 truncate">
+              <>
+                <LoadingCredit />
+                <LoadingCredit />
+                <LoadingCredit />
+              </>
+            ) : transactions.slice(-10).map((transaction) => (
+              <li key={transaction.id} className="flex justify-between items-center py-3 pr-4 pl-3 text-sm">
+                <div className="flex flex-1 items-center w-0">
+                  <span className="flex-1 ml-2 w-0 truncate">
                     Buyer: {transaction.buyer}, Credit: {transaction.credit}, Amount: {transaction.amount}, Total Price: ${transaction.total_price}, Date: {new Date(transaction.timestamp).toLocaleString()}
                   </span>
                 </div>
@@ -330,15 +330,15 @@ const AdminDashboard = () => {
 
 
       {modalVisible && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Expire Credit</h3>
+        <div className="flex fixed inset-0 z-50 justify-center items-center bg-gray-800 bg-opacity-75">
+          <div className="p-6 w-full max-w-md bg-white rounded-lg shadow-lg">
+            <h3 className="mb-4 text-lg font-medium text-gray-900">Expire Credit</h3>
             <div className="space-y-4">
               <input
                 type="text"
                 name="creditName"
                 placeholder="Credit Name"
-                className="w-full p-2 border rounded"
+                className="p-2 w-full rounded border"
                 value={expirationData.creditName}
                 onChange={handleModalInputChange}
               />
@@ -346,7 +346,7 @@ const AdminDashboard = () => {
                 type="number"
                 name="amountReduced"
                 placeholder="Amount Reduced"
-                className="w-full p-2 border rounded"
+                className="p-2 w-full rounded border"
                 value={expirationData.amountReduced}
                 onChange={handleModalInputChange}
               />
@@ -354,32 +354,32 @@ const AdminDashboard = () => {
                 type="password"
                 name="password"
                 placeholder="Your Password"
-                className="w-full p-2 border rounded"
+                className="p-2 w-full rounded border"
                 value={expirationData.password}
                 onChange={handleModalInputChange}
               />
-              
+
               {/* File Upload Input for PDF */}
-              <br/><br/><br/>
+              <br /><br /><br />
               <p className="mt-1 text-sm text-black-500"> Add a document proof of expiration for Audit:</p>
               <input
                 type="file"
                 name="pdfFile"
                 accept="application/pdf"
-                className="w-full p-2 border rounded"
+                className="p-2 w-full rounded border"
                 onChange={handleFileChange}  // Handle file change
               />
-              
+
               <div className="flex justify-end space-x-2">
                 <button
                   onClick={closeModal}
-                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                  className="py-2 px-4 text-white bg-gray-500 rounded hover:bg-gray-600"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSubmitRequest}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="py-2 px-4 text-white bg-blue-500 rounded hover:bg-blue-600"
                 >
                   Submit Request
                 </button>
@@ -392,4 +392,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default NGODashboard;

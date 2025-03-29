@@ -11,14 +11,14 @@ const Login = ({ onLogin }) => {
   const navigate = useNavigate();
   const SITE_KEY = process.env.REACT_APP_SITE_KEY || '1x00000000000000000000AA';
   const [showPassword, setShowPassword] = useState(false);
-  const [loadStatus, setLoadSatus] = useState(false);
-  const [showTestPrompt, setShowTestPrompt] = useState(true); 
+  const [loadStatus, setLoadStatus] = useState(false);
+  const [showTestPrompt, setShowTestPrompt] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => setShowTestPrompt(false), 10000); // Auto-hide after 5 sec
+    setTimeout(() => setShowTestPrompt(false), 10000); // Auto-hide after 10 sec
   }, []);
 
-  
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -31,16 +31,16 @@ const Login = ({ onLogin }) => {
     }
     e.preventDefault();
     try {
-      setLoadSatus(true);
+      setLoadStatus(true);
       const response = await login({ ...formData, 'cf-turnstile-response': captchaToken });
       localStorage.setItem('token', response.data.access_token);
 
       const userRole = response.data.role;
       onLogin({ username: formData.username, role: userRole });
 
-      navigate(userRole === 'admin' ? '/admin-dashboard' : '/buyer-dashboard');
+      navigate(userRole === 'NGO' ? '/NGO-dashboard' : '/buyer-dashboard');
     } catch (error) {
-      setLoadSatus(false);
+      setLoadStatus(false);
       if (error.status === 401) {
         setStatus(error?.response?.data?.message)
         setInterval(() => setStatus(null), 3000)
@@ -63,10 +63,10 @@ const Login = ({ onLogin }) => {
         )}
 
         {showTestPrompt && (
-          <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-white shadow-lg p-4 rounded-lg flex items-center gap-4">
+          <div className="flex fixed top-5 left-1/2 gap-4 items-center p-4 bg-white rounded-lg shadow-lg transform -translate-x-1/2">
             <span>Login as:</span>
             <button
-              className="px-3 py-1 bg-cyan-800 text-white rounded-md"
+              className="py-1 px-3 text-white bg-cyan-800 rounded-md"
               onClick={() => {
                 setFormData({ username: "test_buyer", password: "sepolia", role: "buyer" });
                 setShowTestPrompt(false);
@@ -75,13 +75,13 @@ const Login = ({ onLogin }) => {
               Test Buyer
             </button>
             <button
-              className="px-3 py-1 bg-emerald-600 text-white rounded-md"
+              className="py-1 px-3 text-white bg-emerald-600 rounded-md"
               onClick={() => {
-                setFormData({ username: "test_admin", password: "sepolia", role: "admin" });
+                setFormData({ username: "test_NGO", password: "sepolia", role: "NGO" });
                 setShowTestPrompt(false);
               }}
             >
-              Test Admin
+              Test NGO
             </button>
           </div>
         )}
@@ -140,7 +140,7 @@ const Login = ({ onLogin }) => {
                   onChange={handleChange}
                 >
                   <option value="buyer">Buyer</option>
-                  <option value="admin">Admin</option>
+                  <option value="NGO">NGO</option>
                 </select>
               </div>
               <div>
@@ -158,7 +158,7 @@ const Login = ({ onLogin }) => {
                   className="py-2 px-4 w-full font-semibold text-white bg-emerald-600 rounded-lg transition-colors duration-300 hover:bg-emerald-700"
                   type="submit"
                 >
-                  {loadStatus? "Loading...": "Log In" }
+                  {loadStatus ? "Loading..." : "Log In"}
                 </button>
               </div>
             </form>

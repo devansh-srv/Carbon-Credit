@@ -19,17 +19,17 @@ api.interceptors.request.use((config) => {
 
 export const login = (credentials) => api.post('/login', credentials);
 export const signup = (userData) => api.post('/signup', userData);
-export const getAdminCredits = () => api.get('/admin/credits');
-export const createAdminCredit = (creditData) => api.post('/admin/credits', creditData);
+export const getNGOCredits = () => api.get('/NGO/credits');
+export const createNGOCredit = (creditData) => api.post('/NGO/credits', creditData);
 export const getBuyerCredits = () => api.get('/buyer/credits');
 export const purchaseCredit = (purchaseData) => api.post('/buyer/purchase', purchaseData);
 export const sellCreditApi = (sellData) => api.patch('/buyer/sell', sellData);
 export const removeSaleCreditApi = (removeData) => api.patch('/buyer/remove-from-sale', removeData);
 export const getPurchasedCredits = () => api.get('/buyer/purchased');
-export const getTransactions = () => api.get('/admin/transactions');
+export const getTransactions = () => api.get('/NGO/transactions');
 export const generateCertificate = (creditId) => api.get(`/buyer/generate-certificate/${creditId}`);
 export const downloadCertificate = (creditId) => api.get(`/buyer/download-certificate/${creditId}`);
-export const expireCreditApi = (expireCreditId) => api.patch(`/admin/credits/expire/${expireCreditId}`);
-export const verifyBeforeExpire = (verificationData) => api.post(`/admin/expire-req`, verificationData);
+export const expireCreditApi = (expireCreditId) => api.patch(`/NGO/credits/expire/${expireCreditId}`);
+export const verifyBeforeExpire = (verificationData) => api.post(`/NGO/expire-req`, verificationData);
 
 export default api;
