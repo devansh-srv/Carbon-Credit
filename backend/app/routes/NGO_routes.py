@@ -43,7 +43,8 @@ def manage_credits():
             name=data['name'], 
             amount=data['amount'], 
             price=data['price'], 
-            creator_id=user.id
+            creator_id=user.id,
+            docu_url = data['secure_url'] 
         )
         db.session.add(new_credit)
         db.session.commit()

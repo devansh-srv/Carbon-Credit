@@ -42,6 +42,7 @@ const NGODashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [pendingCr, setPendingCr] = useState(false);
   const [pendingTx, setPendingTx] = useState(null);
+  const [docUrl, setDocUrl] = useState('')
   const [expirationData, setExpirationData] = useState({
     creditName: "",
     amountReduced: "",
@@ -64,7 +65,7 @@ const NGODashboard = () => {
     fetchCredits();
   }, []);
 
-  const [newCredit, setNewCredit] = useState({ creditId: 0, name: '', amount: '', price: '' });
+  const [newCredit, setNewCredit] = useState({ creditId: 0, name: '', amount: '', price: '', secure_url: '' });
 
   const handleCreateCredit = async (e) => {
     e.preventDefault();
@@ -79,11 +80,12 @@ const NGODashboard = () => {
       const newCreditId = await getNextCreditId(); // Resolve the promise
       console.log("Resolved newCredit ID:", newCreditId);
 
-      const updatedCredit = { ...newCredit, creditId: Number(newCreditId) }; // Update with the resolved ID
+      const updatedCredit = { ...newCredit, creditId: Number(newCreditId), secure_url: docUrl }; // Update with the resolved ID
       console.log("Updated Credit Object:", updatedCredit);
 
       await generateCredit(updatedCredit.amount, updatedCredit.price); // Use updated credit here
       const response = await createNGOCredit(updatedCredit);
+      console.log('response: ', response)
 
       // Refetch the updated credit list after successful creation
       const updatedCredits = await getNGOCredits();
@@ -252,7 +254,10 @@ const NGODashboard = () => {
         body: formData
       });
       const data = await response.json();
-      console.log('File uploaded to Cloudinary: ', data);
+      // console.log('File uploaded to Cloudinary: ', data);
+      console.log('secure_url: ', data['secure_url'])
+      setDocUrl(data['secure_url'])
+      console.log('docUrl: ', docUrl)
       Swal.fire({
         icon: "success",
         title: "File Uploaded",
