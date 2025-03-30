@@ -140,7 +140,7 @@ contract CarbonCredit {
 
     function requestAudit(uint256 creditId) external payable {
         if(credits[creditId].requestStatus != 0){revert AuditRequestedAlready();}
-        if(msg.value<(1e15*credits[creditId].amount)){revert MinAuditFees();}
+        if(msg.value<(1e14*credits[creditId].amount)){revert MinAuditFees();}
 
         credits[creditId].requestStatus = 1;
         credits[creditId].auditFees = msg.value;
@@ -151,6 +151,9 @@ contract CarbonCredit {
 
         if(msg.sender == credit.creator){
             revert CreatorCantAudit(); 
+        }
+        if(credit.requestStatus != 2){
+            revert AlreadyAudited();
         }
         for (uint i = 0; i < credit.auditorsList.length; i++) {
             if (credit.auditorsList[i] == msg.sender) {

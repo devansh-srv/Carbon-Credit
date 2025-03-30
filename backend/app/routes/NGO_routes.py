@@ -43,6 +43,11 @@ def manage_credits():
 
     # Allow the NGO to create new credits
     if request.method == 'POST':
+        
+        
+        #do something regarding the amount 
+        data = request.json
+
         auditors = User.query.filter_by(role = 'auditor').all()
         auditor_ids = [auditor.id for auditor in auditors]
         k = numberOfAuditors(int(data['amount']))
@@ -51,8 +56,6 @@ def manage_credits():
         except ValueError:
             return jsonify({"message": "Not enough auditors"}), 413
         
-        #do something regarding the amount 
-        data = request.json
         new_credit = Credit(
             id=data['creditId'],
             name=data['name'], 
@@ -60,8 +63,8 @@ def manage_credits():
             price=data['price'], 
             creator_id=user.id,
             docu_url = data['secure_url'],
-            auditors = selected_auditor_ids
-            
+            auditors = selected_auditor_ids,
+            req_status = 1
         )
         db.session.add(new_credit)
         db.session.commit()

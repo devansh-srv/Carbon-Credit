@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { getNGOCredits, createNGOCredit, getTransactions, expireCreditApi, verifyBeforeExpire } from '../api/api';
+import { getNGOCredits, createNGOCredit, getTransactions, expireCreditApi, verifyBeforeExpire, } from '../api/api';
 import { CC_Context } from "../context/SmartContractConnector.js";
+import { ethers } from "ethers";
 import Swal from 'sweetalert2';
 import { Loader2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone'
@@ -31,7 +32,8 @@ const NGODashboard = () => {
     connectWallet,
     generateCredit,
     getNextCreditId,
-    expireCredit
+    expireCredit,
+    requestAudit
   } = useContext(CC_Context);
 
   const [myCredits, setMyCredits] = useState([]);
@@ -65,7 +67,7 @@ const NGODashboard = () => {
     fetchCredits();
   }, []);
 
-  const [newCredit, setNewCredit] = useState({ creditId: 0, name: '', amount: '', price: '', secure_url: '' });
+  const [newCredit, setNewCredit] = useState({ creditId: 0, name: '', amount: '', price: '', auditFees: '', secure_url: '' });
 
   const handleCreateCredit = async (e) => {
     e.preventDefault();
@@ -84,6 +86,8 @@ const NGODashboard = () => {
       console.log("Updated Credit Object:", updatedCredit);
 
       await generateCredit(updatedCredit.amount, updatedCredit.price); // Use updated credit here
+      await requestAudit(newCreditId, updatedCredit.auditFees);
+
       const response = await createNGOCredit(updatedCredit);
       console.log('response: ', response)
 
@@ -324,6 +328,15 @@ const NGODashboard = () => {
                   onChange={handleInputChange}
                   required
                 />
+                <input
+                  className="input"
+                  type="number"
+                  name="auditFees"
+                  placeholder={`Audit Fees min:${newCredit.amount * 0.01*0.01} ETH`}
+                  value={newCredit.auditFees}
+                  onChange={handleInputChange}
+                  required
+                />
                 <div className="py-5 px-4 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                   <dt className="text-sm font-medium text-gray-500">Upload Project PDF</dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
@@ -371,7 +384,7 @@ const NGODashboard = () => {
                   <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                   Generating Credit...
                 </span>
-                  : "Create Credit"}</button>
+                  : "Create Credit & Request Audit"}</button>
               </form>
             </dd>
           </div>

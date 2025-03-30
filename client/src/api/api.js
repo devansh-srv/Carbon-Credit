@@ -31,5 +31,6 @@ export const generateCertificate = (creditId) => api.get(`/buyer/generate-certif
 export const downloadCertificate = (creditId) => api.get(`/buyer/download-certificate/${creditId}`);
 export const expireCreditApi = (expireCreditId) => api.patch(`/NGO/credits/expire/${expireCreditId}`);
 export const verifyBeforeExpire = (verificationData) => api.post(`/NGO/expire-req`, verificationData);
+export const getAssignedCredits = () => api.get('/auditor/credits');
 
 export default api;

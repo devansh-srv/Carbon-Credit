@@ -8,7 +8,7 @@ const ONE_GWEI = 1_000_000_000n;
 
 module.exports = buildModule("CC", (m) => {
 
-  const cc = m.contract("SimpleCarbonCredit", []);
+  const cc = m.contract("CarbonCredit", []);
 
   console.log(`CC deployed to: ${cc.address}`);
   return { cc };

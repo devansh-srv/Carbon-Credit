@@ -419,6 +419,21 @@ const TestPage = () => {
                     <p style={{ margin: "0" }}>
                       <strong>For Sale:</strong> {creditDetails.forSale ? "Yes" : "No"}
                     </p>
+                    <p style={{ margin: "0" }}>
+                      <strong>Request status:</strong> {creditDetails.requestStatus.toString()}
+                    </p>
+                    <p style={{ margin: "0" }}>
+                      <strong>num of auditors:</strong> {creditDetails.numOfAuditors.toString()}
+                    </p>
+                    <p style={{ margin: "0" }}>
+                      <strong>audit fees:</strong> {creditDetails.auditFees.toString()}
+                    </p>
+                    <p style={{ margin: "0" }}>
+                      <strong>audit Score:</strong> {creditDetails.auditScore.toString()}
+                    </p>
+                    <p style={{ margin: "0" }}>
+                      <strong>auditors List:</strong> {creditDetails.auditorsList}
+                    </p>
                   </div>
                 </div>
               )}

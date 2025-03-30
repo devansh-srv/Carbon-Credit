@@ -209,7 +209,12 @@ export const CCProvider = ({ children }) => {
                 creator: credit.creator,
                 expired: credit.expired,
                 price: credit.price,
-                forSale: credit.forSale
+                forSale: credit.forSale,
+                requestStatus: credit.requestStatus,
+                numOfAuditors: credit.numOfAuditors,
+                auditFees: credit.auditFees,
+                auditScore: credit.auditScore,
+                auditorsList: credit.auditorsList
             };
         } catch (error) {
             console.error('Error getting credit details:', error);
@@ -384,6 +389,10 @@ export const CCProvider = ({ children }) => {
                 getCreditDetails,
                 getNextCreditId,
                 getPrice,
+                requestAudit,
+                auditCredit,
+                getAuditorList,
+                getContractBalance,
                 error,
             }}
         >

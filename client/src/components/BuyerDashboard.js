@@ -264,7 +264,18 @@ const BuyerDashboard = () => {
                         </span>
                       </div>
 
-                      <div className="flex-shrink-0 ml-4">
+                      <div className="flex-shrink-0 ml-4 flex items-center gap-2">
+                        {/* View Project Documents button - aligned left */}
+                        {credit.secure_url && (
+                          <button
+                            type="button"
+                            onClick={() => window.open(credit.secure_url, "_blank")}
+                            className="py-1 px-3 text-white bg-gray-500 rounded hover:bg-gray-600"
+                          >
+                            View Project Documents
+                          </button>
+                        )}
+
                         {credit.is_expired ? (
                           <div className="flex gap-4">
                             <button

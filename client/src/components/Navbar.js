@@ -61,6 +61,14 @@ const Navbar = ({ user, onLogout }) => {
               Buyer Dashboard
             </Link>
           )}
+          {user && user.role === 'auditor' && (
+            <Link
+              to="/auditor-dashboard"
+              className="text-emerald-700 transition hover:text-emerald-900"
+            >
+              Auditor Dashboard
+            </Link>
+          )}
           {user && (
             <button
               onClick={onLogout}

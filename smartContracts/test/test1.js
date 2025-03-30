@@ -6,7 +6,7 @@ describe("Carbon Credit", function(){
   async function deployFixture() {
     const [acc1, acc2, acc3] = await ethers.getSigners();
     // const Contract = await ethers.getContractFactory("SimpleCarbonCredit");
-    const carbonCredit = await ethers.deployContract("SimpleCarbonCredit");
+    const carbonCredit = await ethers.deployContract("CarbonCredit");
     await carbonCredit.waitForDeployment();
 
     return {carbonCredit, acc1, acc2, acc3};
