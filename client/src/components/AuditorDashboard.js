@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { getBuyerCredits, purchaseCredit, sellCreditApi, removeSaleCreditApi, getPurchasedCredits, getAssignedCredits } from '../api/api';
+import { getAssignedCredits } from '../api/api';
 import { CC_Context } from "../context/SmartContractConnector.js";
-import { ethers } from "ethers";
-import { Eye, EyeClosed, Loader2 } from 'lucide-react';
 
 const LoadingCredit = () => (
   <li className="flex justify-between items-center py-3 pr-4 pl-3 text-sm animate-pulse">
@@ -15,83 +13,56 @@ const LoadingCredit = () => (
   </li>
 );
 
-
-
 const AuditorDashboard = () => {
   const [AssignedCredits, setAssignedCredits] = useState([]);
-  const [purchasedCredits, setPurchasedCredits] = useState([]);
-  const [certificateData, setCertificateData] = useState(null);
-  const [error, setError] = useState(null);
-  const [showCertificate, setShowCertificate] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
-  const [pendingTx, setPendingTx] = useState(null);
+  const [error, setError] = useState(null);
+  const [auditCreditId, setAuditCreditId] = useState(null);
+  const [auditReason, setAuditReason] = useState("");
 
-  const {
-    connectWallet,
-    generateCredit,
-    getCreditDetails,
-    getNextCreditId,
-    getPrice,
-    sellCredit,
-    removeFromSale,
-    buyCredit,
-    currentAccount,
-    auditCredit
-    // error 
-  } = useContext(CC_Context);
-
-  const fetchAllCredits = async () => {
-    try {
-      setIsLoading(true);
-      const [assignedResposne, purchasedResponse] = await Promise.all([
-        getAssignedCredits(),
-        getPurchasedCredits()
-      ]);
-
-      const creditsWithSalePrice = purchasedResponse.data.map(credit => ({
-        ...credit,
-        salePrice: '', // Initialize salePrice if not present
-      }));
-
-      setPurchasedCredits(creditsWithSalePrice);
-      setAssignedCredits(assignedResposne.data);
-
-      // setPurchasedCredits(purchasedResponse.data);
-    } catch (error) {
-      console.error('Failed to fetch credits:', error);
-      setError('Failed to fetch credits. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { auditCredit } = useContext(CC_Context);
 
   useEffect(() => {
+    const fetchAllCredits = async () => {
+      try {
+        setIsLoading(true);
+        const assignedResponse = await getAssignedCredits();
+        setAssignedCredits(assignedResponse.data);
+      } catch (error) {
+        console.error('Failed to fetch credits:', error);
+        setError('Failed to fetch credits. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
     fetchAllCredits();
   }, []);
 
-  const handleAudit = async (creditId) => {
+  const handleAudit = (creditId) => {
+    setAuditCreditId(creditId === auditCreditId ? null : creditId);
+  };
+
+  const handleAcceptCredit = async (creditId) => {
     try {
-      setError(null);
-      setPendingTx(creditId);
-
-      const credit = await getCreditDetails(creditId);
-
-      // Convert the price from wei to ether for the transaction
-      const priceInEther = ethers.formatEther(credit.price);
-      console.log("id, price: ", creditId, priceInEther);
-      await buyCredit(creditId, priceInEther);
-      await purchaseCredit({ credit_id: creditId, amount: 1 });
-      await fetchAllCredits(); // Refresh both available and purchased credits
+      console.log("Accepting credit id:", creditId);
+      await auditCredit(creditId, true);
+      setAuditCreditId(null);
     } catch (error) {
-      console.error('Failed to purchase credit:', error);
-      setError('Failed to purchase credit. Please try again.');
-    } finally {
-      setPendingTx(null);
+      console.error("Error in audit:", error);
+      throw error;
     }
   };
 
-
-
+  const handleRejectCredit = async (creditId) => {
+    try {
+      console.log("Rejecting credit id:", creditId);
+      await auditCredit(creditId, false);
+      setAuditCreditId(null);
+    } catch (error) {
+      console.error("Error in audit:", error);
+      throw error;
+    }
+  };
 
   return (
     <div className="overflow-hidden bg-white bg-gradient-to-br from-blue-100 to-indigo-300 shadow sm:rounded-lg">
@@ -126,34 +97,62 @@ const AuditorDashboard = () => {
                       </span>
                     </div>
                     <div className="flex-shrink-0 ml-4">
-                      <>
-                        {
-                          credit.secure_url ?
-                            <button
-                              type='button'
-                              onClick={() => window.open(credit.secure_url, '_blank')}
-                              className="py-2 px-4 mr-4 font-sans text-white bg-blue-500 rounded hover:bg-blue-800">
-                              View Project Documents
-                            </button> : <></>
-                        }
+                      {credit.secure_url && (
+                        <button
+                          type='button'
+                          onClick={() => window.open(credit.secure_url, '_blank')}
+                          className="py-2 px-4 mr-4 font-sans text-white bg-blue-500 rounded hover:bg-blue-800">
+                          View Project Documents
+                        </button>
+                      )}
+                      {auditCreditId !== credit.id && (
                         <button
                           onClick={() => handleAudit(credit.id)}
                           className="btn btn-secondary"
-                          disabled={credit.amount <= 0 || pendingTx === credit.id}
                         >
                           Audit
-                        </button></>
+                        </button>
+                      )}
                     </div>
+
+                    {auditCreditId === credit.id && (
+                      <div className="mt-3 p-4 border rounded bg-white shadow">
+                        <h4 className="text-sm font-medium text-gray-900">Audit Credit</h4>
+                        <textarea
+                          className="w-full p-2 mt-2 border rounded"
+                          placeholder="Enter reason for audit"
+                          value={auditReason}
+                          onChange={(e) => setAuditReason(e.target.value)}
+                        ></textarea>
+                        <div className="mt-3 flex gap-2">
+                          <button 
+                            className="py-2 px-4 bg-green-500 text-white rounded hover:bg-green-400"
+                            onClick={() => handleAcceptCredit(credit.id)}
+                          >
+                            Accept Credit
+                          </button>
+                          <button 
+                            className="py-2 px-4 bg-red-500 text-white rounded hover:bg-red-400"
+                            onClick={() => handleRejectCredit(credit.id)}
+                          >
+                            Reject Credit
+                          </button>
+                          <button
+                            className="py-2 px-4 bg-gray-500 text-white rounded hover:bg-gray-400"
+                            onClick={() => setAuditCreditId(null)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>
             </dd>
           </div>
-
-
         </dl>
       </div>
-
     </div>
   );
 };

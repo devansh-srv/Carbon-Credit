@@ -152,7 +152,7 @@ contract CarbonCredit {
         if(msg.sender == credit.creator){
             revert CreatorCantAudit(); 
         }
-        if(credit.requestStatus != 2){
+        if(credit.requestStatus != 1){
             revert AlreadyAudited();
         }
         for (uint i = 0; i < credit.auditorsList.length; i++) {
