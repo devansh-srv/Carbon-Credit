@@ -223,7 +223,7 @@ const BuyerDashboard = () => {
                         <button
                           type='button'
                           onClick={() => window.open(credit.secure_url, '_blank')}
-                          className="py-2 px-4 mr-4 font-sans text-white bg-blue-500 rounded hover:bg-blue-400">
+                          className="py-2 px-4 mr-4 font-sans text-white bg-blue-500 rounded hover:bg-blue-800">
                           View Project Documents
                         </button>
                         <button
@@ -264,7 +264,7 @@ const BuyerDashboard = () => {
                         </span>
                       </div>
 
-                      <div className="flex-shrink-0 ml-4 flex items-center gap-2">
+                      <div className="flex flex-shrink-0 gap-2 items-center ml-4">
                         {/* View Project Documents button - aligned left */}
                         {credit.secure_url && (
                           <button

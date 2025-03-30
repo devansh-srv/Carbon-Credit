@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { getBuyerCredits, purchaseCredit, sellCreditApi, removeSaleCreditApi, getPurchasedCredits, getAssignedCredits} from '../api/api';
+import { getBuyerCredits, purchaseCredit, sellCreditApi, removeSaleCreditApi, getPurchasedCredits, getAssignedCredits } from '../api/api';
 import { CC_Context } from "../context/SmartContractConnector.js";
 import { ethers } from "ethers";
 import { Eye, EyeClosed, Loader2 } from 'lucide-react';
@@ -90,7 +90,7 @@ const AuditorDashboard = () => {
     }
   };
 
-  
+
 
 
   return (
@@ -127,15 +127,15 @@ const AuditorDashboard = () => {
                     </div>
                     <div className="flex-shrink-0 ml-4">
                       <>
-                      {
-                       credit.secure_url?
-                        <button
-                          type='button'
-                          onClick={() => window.open(credit.secure_url, '_blank')}
-                          className="py-2 px-4 mr-4 font-sans text-white bg-blue-500 rounded hover:bg-blue-400">
-                          View Project Documents
-                        </button>:<></>
-                      }
+                        {
+                          credit.secure_url ?
+                            <button
+                              type='button'
+                              onClick={() => window.open(credit.secure_url, '_blank')}
+                              className="py-2 px-4 mr-4 font-sans text-white bg-blue-500 rounded hover:bg-blue-800">
+                              View Project Documents
+                            </button> : <></>
+                        }
                         <button
                           onClick={() => handleAudit(credit.id)}
                           className="btn btn-secondary"

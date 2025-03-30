@@ -332,7 +332,7 @@ const NGODashboard = () => {
                   className="input"
                   type="number"
                   name="auditFees"
-                  placeholder={`Audit Fees min:${newCredit.amount * 0.01*0.01} ETH`}
+                  placeholder={`Audit Fees min:${newCredit.amount * 0.01 * 0.01} ETH`}
                   value={newCredit.auditFees}
                   onChange={handleInputChange}
                   required
@@ -340,7 +340,7 @@ const NGODashboard = () => {
                 <div className="py-5 px-4 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                   <dt className="text-sm font-medium text-gray-500">Upload Project PDF</dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                    <div {...getRootProps()} className="p-6 text-center border-2 border-gray-400 border-dashed">
+                    <div {...getRootProps()} className="p-6 text-center rounded border-2 border-gray-400 border-dashed hover:border-blue-600">
                       <input {...getInputProps()} />
                       {isDragActive ? (
                         <p>Drop the files here ...</p>
@@ -354,13 +354,13 @@ const NGODashboard = () => {
                               <button
                                 type='button'
                                 onClick={onSubmit}
-                                className="py-2 px-4 font-sans text-white bg-green-500 rounded hover:bg-green-400">
+                                className="py-2 px-4 font-sans text-white bg-green-500 rounded hover:bg-green-800">
                                 Confirm Upload
                               </button>
                               <button
                                 type='button'
                                 onClick={open}
-                                className="py-2 px-4 ml-2 font-sans text-black bg-blue-400 rounded hover:bg-gray-100">
+                                className="py-2 px-4 ml-2 font-sans text-white bg-blue-500 rounded hover:bg-blue-800">
                                 Upload another file
                               </button>
                             </>
@@ -372,7 +372,7 @@ const NGODashboard = () => {
                           <button
                             type='button'
                             onClick={open}
-                            className="py-2 px-4 font-sans text-black bg-blue-400 rounded hover:bg-gray-100">
+                            className="py-2 px-4 font-sans text-black bg-blue-500 rounded hover:bg-blue-800">
                             Upload Project File
                           </button>
                         </>
