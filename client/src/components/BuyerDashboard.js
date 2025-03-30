@@ -7,7 +7,7 @@ import { Eye, EyeClosed, Loader2 } from 'lucide-react';
 const LoadingCredit = () => (
   <li className="flex justify-between items-center py-3 pr-4 pl-3 text-sm animate-pulse">
     <div className="flex-1">
-      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+      <div className="w-3/4 h-4 bg-gray-200 rounded"></div>
     </div>
     <div className="w-16">
       <div className="h-8 bg-gray-200 rounded"></div>
@@ -59,7 +59,7 @@ const BuyerDashboard = () => {
     } catch (error) {
       console.error('Failed to fetch credits:', error);
       setError('Failed to fetch credits. Please try again.');
-    }finally {
+    } finally {
       setIsLoading(false);
     }
   };
@@ -72,19 +72,19 @@ const BuyerDashboard = () => {
     try {
       setError(null);
       setPendingTx(creditId);
-      
-      const credit = await getCreditDetails(creditId );
+
+      const credit = await getCreditDetails(creditId);
 
       // Convert the price from wei to ether for the transaction
       const priceInEther = ethers.formatEther(credit.price);
-      console.log("id, price: ", creditId , priceInEther);
-      await buyCredit(creditId , priceInEther);
+      console.log("id, price: ", creditId, priceInEther);
+      await buyCredit(creditId, priceInEther);
       await purchaseCredit({ credit_id: creditId, amount: 1 });
       await fetchAllCredits(); // Refresh both available and purchased credits
     } catch (error) {
       console.error('Failed to purchase credit:', error);
       setError('Failed to purchase credit. Please try again.');
-    } finally{
+    } finally {
       setPendingTx(null);
     }
   };
@@ -101,7 +101,7 @@ const BuyerDashboard = () => {
     }
   };
 
-  const handleHideCertificate = async() => {
+  const handleHideCertificate = async () => {
     setCertificateData(null);
     setShowCertificate(true);
   }
@@ -153,7 +153,7 @@ const BuyerDashboard = () => {
       console.log(`Credit put on sale with price: ${updatedCredit.salePrice}`);
 
       // Call API to mark credit as on sale in the backend and contract
-      await sellCredit(creditId , updatedCredit.salePrice);
+      await sellCredit(creditId, updatedCredit.salePrice);
       const respose = await sellCreditApi({ credit_id: creditId, salePrice: updatedCredit.salePrice });
       console.log(respose);
       await fetchAllCredits();
@@ -174,7 +174,7 @@ const BuyerDashboard = () => {
       );
 
       // Call API to remove the credit from sale in the backend
-      await removeFromSale(creditId );
+      await removeFromSale(creditId);
       await removeSaleCreditApi({ credit_id: creditId })
       console.log(`Removed credit ID ${creditId} from sale`);
       await fetchAllCredits();
@@ -187,7 +187,7 @@ const BuyerDashboard = () => {
 
 
   return (
-    <div className="overflow-hidden bg-white shadow sm:rounded-lg bg-gradient-to-br from-blue-100 to-indigo-300 ">
+    <div className="overflow-hidden bg-white bg-gradient-to-br from-blue-100 to-indigo-300 shadow sm:rounded-lg">
       <div className="py-5 px-4 sm:px-6">
         <h3 className="text-lg font-medium leading-6 text-gray-900">Buyer Dashboard</h3>
         <p className="mt-1 max-w-2xl text-sm text-gray-500">View and purchase carbon credits</p>
@@ -219,20 +219,27 @@ const BuyerDashboard = () => {
                       </span>
                     </div>
                     <div className="flex-shrink-0 ml-4">
-                      <button
-                        onClick={() => handleBuyCredit(credit.id)}
-                        className="btn btn-secondary"
-                        disabled={credit.amount <= 0 || pendingTx === credit.id}
-                      >
-                        {pendingTx === credit.id ? (
-                          <span className='flex'>
-                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                            Processing...
-                          </span>
-                        ) : (
-                          credit.amount > 0 ? 'Buy' : 'Out of Stock'
-                        )}
-                      </button>
+                      <>
+                        <button
+                          type='button'
+                          onClick={() => window.open(credit.secure_url, '_blank')}
+                          className="py-2 px-4 mr-4 font-sans text-white bg-blue-500 rounded hover:bg-blue-400">
+                          View Project Documents
+                        </button>
+                        <button
+                          onClick={() => handleBuyCredit(credit.id)}
+                          className="btn btn-secondary"
+                          disabled={credit.amount <= 0 || pendingTx === credit.id}
+                        >
+                          {pendingTx === credit.id ? (
+                            <span className='flex'>
+                              <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                              Processing...
+                            </span>
+                          ) : (
+                            credit.amount > 0 ? 'Buy' : 'Out of Stock'
+                          )}
+                        </button></>
                     </div>
                   </li>
                 ))}
@@ -261,17 +268,17 @@ const BuyerDashboard = () => {
                         {credit.is_expired ? (
                           <div className="flex gap-4">
                             <button
-                              onClick={() => {showCertificate? handleGenerateCertificate(credit.id): handleHideCertificate()}}
+                              onClick={() => { showCertificate ? handleGenerateCertificate(credit.id) : handleHideCertificate() }}
                               className="btn bg-sky-500"
                             >
-                              {showCertificate? <Eye/> : <EyeClosed/>}
+                              {showCertificate ? <Eye /> : <EyeClosed />}
                             </button>
-                            
+
                             <button
                               onClick={() => handleDownloadCertificate(credit.id)}
                               className="btn btn-secondary"
                             >
-                              Download 
+                              Download
                             </button>
                           </div>
                         ) : credit.is_active ? (
@@ -338,7 +345,7 @@ const BuyerDashboard = () => {
           )}
         </dl>
       </div>
-      
+
     </div>
   );
 };

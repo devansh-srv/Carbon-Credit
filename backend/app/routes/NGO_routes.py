@@ -32,7 +32,8 @@ def manage_credits():
             "price": c.price,
             "is_active": c.is_active,
             "is_expired": c.is_expired,
-            "creator_id": c.creator_id
+            "creator_id": c.creator_id,
+            "secure_url": c.docu_url,
         } for c in credits]), 200
 
     # Allow the NGO to create new credits

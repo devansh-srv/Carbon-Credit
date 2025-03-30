@@ -397,17 +397,24 @@ const NGODashboard = () => {
                       </span>
                     </div>
                     {!credit.is_expired ? (
-                      <button
-                        onClick={() => openModal(credit)}
-                        className="py-1 px-3 ml-4 text-white rounded hover:opacity-90"
-                        style={{ backgroundColor: "#415e02" }}
-                      >
-                        {pendingTx === credit.id ? <span className='flex'>
-                          <Loader2 className="mr-2 w-4 h-4 animate-spin" />
-                          Processing...
-                        </span>
-                          : 'Expire Credit'}
-                      </button>
+                      <>
+                        <button
+                          type='button'
+                          onClick={() => window.open(credit.secure_url, '_blank')}
+                          className="py-2 px-4 font-sans text-white bg-green-500 rounded hover:bg-green-400">
+                          View Project Documents
+                        </button>
+                        <button
+                          onClick={() => openModal(credit)}
+                          className="py-1 px-3 ml-4 text-white rounded hover:opacity-90"
+                          style={{ backgroundColor: "#415e02" }}
+                        >
+                          {pendingTx === credit.id ? <span className='flex'>
+                            <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                            Processing...
+                          </span>
+                            : 'Expire Credit'}
+                        </button></>
                     ) : <span className='text-emerald-900'>Expired !</span>}
                   </li>
                 ))}

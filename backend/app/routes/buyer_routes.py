@@ -22,7 +22,7 @@ def get_current_user():
 @jwt_required()
 def buyer_credits():
     credits = Credit.query.filter_by(is_active =True).all()
-    return jsonify([{"id": c.id, "name": c.name, "amount": c.amount, "price": c.price,"creator":c.creator_id} for c in credits])
+    return jsonify([{"id": c.id, "name": c.name, "amount": c.amount, "price": c.price,"creator":c.creator_id, "secure_url": c.docu_url} for c in credits])
 
 @buyer_bp.route('/api/buyer/purchase', methods=['POST'])
 @jwt_required()
