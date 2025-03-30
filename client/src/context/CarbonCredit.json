@@ -1,0 +1,382 @@
+[
+	{
+		"inputs": [],
+		"name": "AlreadyAudited",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "AuditRequestedAlready",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "CreatorCantAudit",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "CreditDoesntExist",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "CreditFailedAudit",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "CreditNotAudited",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "CreditNotForSale",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "FeeTransactionFailed",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "MinAuditFees",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "OnlyCreatorCanExpire",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "OnlyOwnerCanRemove",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "OnlyOwnerCanSell",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "PriceNotMet",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "creditId",
+				"type": "uint256"
+			}
+		],
+		"name": "Expire",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "creditId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "vote",
+				"type": "bool"
+			}
+		],
+		"name": "auditCredit",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "creditId",
+				"type": "uint256"
+			}
+		],
+		"name": "buyCredit",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "credits",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "creator",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "expired",
+				"type": "bool"
+			},
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "forSale",
+				"type": "bool"
+			},
+			{
+				"internalType": "uint8",
+				"name": "requestStatus",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint256",
+				"name": "numOfAuditors",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "auditFees",
+				"type": "uint256"
+			},
+			{
+				"internalType": "int256",
+				"name": "auditScore",
+				"type": "int256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			}
+		],
+		"name": "generateCredit",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "creditId",
+				"type": "uint256"
+			}
+		],
+		"name": "getAuditorList",
+		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "",
+				"type": "address[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "creditId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "auditor",
+				"type": "address"
+			}
+		],
+		"name": "getAuditorVote",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getContractBalance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "creditId",
+				"type": "uint256"
+			}
+		],
+		"name": "getCreator",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getNextCreditId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "creditId",
+				"type": "uint256"
+			}
+		],
+		"name": "getOwner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "creditId",
+				"type": "uint256"
+			}
+		],
+		"name": "getPrice",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "creditId",
+				"type": "uint256"
+			}
+		],
+		"name": "isExpired",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "creditId",
+				"type": "uint256"
+			}
+		],
+		"name": "removeFromSale",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "creditId",
+				"type": "uint256"
+			}
+		],
+		"name": "requestAudit",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "creditId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			}
+		],
+		"name": "sellCredit",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]

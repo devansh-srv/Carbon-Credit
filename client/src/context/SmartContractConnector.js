@@ -251,6 +251,87 @@ export const CCProvider = ({ children }) => {
 
     }
 
+    const requestAudit = async (creditId, price) => {
+        try{
+            const web3Modal = new Web3Modal();
+            const connection = await web3Modal.connect();
+            const provider = new ethers.BrowserProvider(connection);
+            const signer = await provider.getSigner();
+            const contract = fetchContract(signer);
+
+            const transaction = await contract.requestAudit(
+                creditId,
+                {
+                    value: ethers.parseEther(price.toString()),
+                    gasLimit: 300000
+                }
+            );
+
+            const receipt = await transaction.wait();
+            console.log("Audit Requested!", receipt);
+            return receipt;
+        } catch(error){
+            console.error("Error Requesting Audit: ", error);
+            throw error;
+        }
+    }
+
+    const auditCredit = async (creditId, vote) => {
+        try{
+            const web3Modal = new Web3Modal();
+            const connection = await web3Modal.connect();
+            const provider = new ethers.BrowserProvider(connection);
+            const signer = await provider.getSigner();
+            const contract = fetchContract(signer);
+
+            const transaction = await contract.auditCredit(
+                creditId, vote,
+                {
+                    gasLimit: 300000
+                }
+            )
+
+            const receipt = await transaction.wait();
+            console.log("credit audited!", receipt);
+            return receipt;
+        } catch (error){
+            console.error("Error in voting", error);
+            throw error;
+        }
+    }
+
+    const getAuditorList = async(creditId) => {
+        try {
+            const web3Modal = new Web3Modal();
+            const connection = await web3Modal.connect();
+            const provider = new ethers.BrowserProvider(connection);
+            const contract = fetchContract(provider);
+
+            const auditorsList = await contract.getAuditorList(creditId);
+
+            return auditorsList;
+        } catch (error) {
+            console.error('Error getting auditors:', error);
+            throw error;
+        }
+    }
+
+    const getContractBalance = async() => {
+        try {
+            const web3Modal = new Web3Modal();
+            const connection = await web3Modal.connect();
+            const provider = new ethers.BrowserProvider(connection);
+            const contract = fetchContract(provider);
+
+            const contractBalance = await contract.getContractBalance();
+
+            return contractBalance;
+        } catch (error) {
+            console.error('Error getting contract Balance:', error);
+            throw error;
+        }
+    }
+
     const checkIfWalletIsConnected = async () => {
         try {
             if (!window.ethereum) {
