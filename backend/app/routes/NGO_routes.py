@@ -20,8 +20,6 @@ def numberOfAuditors(k) -> int:
 
 @NGO_bp.route('/api/NGO/credits', methods=['GET', 'POST'])
 @jwt_required()
-
-
 def manage_credits():
     current_user = get_current_user()
     if current_user.get('role') != 'NGO':
@@ -32,16 +30,24 @@ def manage_credits():
     # Ensure only credits created by this NGO are visible
     if request.method == 'GET':
         credits = Credit.query.filter_by(creator_id=user.id).all()
-        return jsonify([{
-            "id": c.id,
-            "name": c.name,
-            "amount": c.amount,
-            "price": c.price,
-            "is_active": c.is_active,
-            "is_expired": c.is_expired,
-            "creator_id": c.creator_id,
-            "secure_url": c.docu_url,
-        } for c in credits]), 200
+        data = []
+        for c in credits:
+            req = Request.query.filter_by(credit_id=c.id).first()
+            data.append({
+                "id": c.id,
+                "name": c.name,
+                "amount": c.amount,
+                "price": c.price,
+                "is_active": c.is_active,
+                "is_expired": c.is_expired,
+                "creator_id": c.creator_id,
+                "secure_url": c.docu_url,
+                "req_status": c.req_status,
+                "auditors_count": len(c.auditors),
+                "auditor_left": len(req.auditors) if req and req.auditors else 0,
+                "score": req.score if req else 0
+            })
+        return jsonify(data), 200
 
     # Allow the NGO to create new credits
     if request.method == 'POST':

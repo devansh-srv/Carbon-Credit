@@ -3,7 +3,7 @@ import { getNGOCredits, createNGOCredit, getTransactions, expireCreditApi, verif
 import { CC_Context } from "../context/SmartContractConnector.js";
 import { ethers } from "ethers";
 import Swal from 'sweetalert2';
-import { Loader2 } from 'lucide-react';
+import { Loader2, File } from 'lucide-react';
 import { useDropzone } from 'react-dropzone'
 import { Cloudinary } from '@cloudinary/url-gen';
 
@@ -51,22 +51,27 @@ const NGODashboard = () => {
     password: "",
   });
 
+  const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
-    const fetchCredits = async () => {
+    const fetchData = async () => {
       try {
-        setIsLoading(true);
-        const response = await getNGOCredits();
-        setMyCredits(response.data);
+        const [creditsResponse, transactionsResponse] = await Promise.all([
+          getNGOCredits(),
+          getTransactions()
+        ]);
+        setMyCredits(creditsResponse.data);
+        setTransactions(transactionsResponse.data);
       } catch (error) {
-        console.error('Failed to fetch credits:', error);
+        console.error('Failed to fetch data:', error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchCredits();
+    fetchData();
   }, []);
 
+  
   const [newCredit, setNewCredit] = useState({ creditId: 0, name: '', amount: '', price: '', auditFees: '', secure_url: '' });
 
   const handleCreateCredit = async (e) => {
@@ -219,22 +224,7 @@ const NGODashboard = () => {
   };
 
 
-  const [transactions, setTransactions] = useState([]);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [creditsResponse, transactionsResponse] = await Promise.all([
-          getNGOCredits(),
-          getTransactions()
-        ]);
-        setMyCredits(creditsResponse.data);
-        setTransactions(transactionsResponse.data);
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-      }
-    };
-    fetchData();
-  }, []);
+  
 
   const onDrop = async (acceptedFiles) => {
     // Handle the dropped files
@@ -418,8 +408,8 @@ const NGODashboard = () => {
                         <button
                           type='button'
                           onClick={() => window.open(credit.secure_url, '_blank')}
-                          className="py-2 px-4 font-sans text-white bg-green-500 rounded hover:bg-green-400">
-                          View Project Documents
+                          className="py-2 px-2 font-sans text-white bg-green-500 rounded hover:bg-green-400">
+                          <File size={20}/>
                         </button>
                         <button
                           onClick={() => openModal(credit)}

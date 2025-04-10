@@ -47,7 +47,7 @@ def audit_credit(credit_id):
     data = request.json
 
     
-    print("credit id", credit_id)
+    # print("credit id", credit_id)
     user = User.query.filter_by(username=current_user.get('username')).first()
     request_obj = Request.query.filter_by(credit_id=credit_id).first()
 
@@ -63,6 +63,13 @@ def audit_credit(credit_id):
     
     # Remove auditor
     request_obj.auditors.remove(user.id)
+
+    # If no auditors left, update req_status in Credit table
+    if len(request_obj.auditors) == 0:
+        credit = Credit.query.filter_by(id=credit_id).first()
+        if credit:
+            credit.req_status = 2
+            
     db.session.commit()
 
     return jsonify({"message": f"Audit completed, vote: {data['vote']}"}), 200
