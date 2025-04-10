@@ -5,7 +5,7 @@ import NGOSignup from './components/NGOSignup';
 import BuyerSignup from './components/BuyerSignup';
 import AuditorSignup from './components/AuditorSignup';
 import Login from './components/Login';
-import NGODashboard from './components/NGODashboard';
+import NGODashboard from './components/NGODashboard/NGODashboard';
 import BuyerDashboard from './components/BuyerDashboard';
 import AuditorDashboard from './components/AuditorDashboard'
 import TestPage from './components/testPage';
