@@ -95,6 +95,10 @@ def sell_credit():
     if credit:
         credit.is_active = True
         credit.price = data['salePrice']
+
+        if(credit.req_status != 3):
+            credit.req_status = 3
+            
         db.session.commit()
 
         return jsonify({"message": f"Credit put to sale with price {data['salePrice']}" }), 200

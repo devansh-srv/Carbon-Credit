@@ -29,7 +29,7 @@ def manage_credits():
 
     # Ensure only credits created by this NGO are visible
     if request.method == 'GET':
-        credits = Credit.query.filter_by(creator_id=user.id).all()
+        credits = Credit.query.filter_by(creator_id=user.id).order_by(Credit.id.asc()).all()
         data = []
         for c in credits:
             req = Request.query.filter_by(credit_id=c.id).first()

@@ -16,6 +16,8 @@ const NGODashboard = () => {
           getNGOCredits(),
           getTransactions()
         ]);
+
+        // console.log(creditsResponse.data)
         setMyCredits(creditsResponse.data);
         setTransactions(transactionsResponse.data);
       } catch (error) {

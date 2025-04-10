@@ -161,8 +161,6 @@ const BuyerDashboard = () => {
       console.error("Can't sale credit: ", error);
       setError('Failed to sell credit');
     }
-
-
   };
 
   const handleRemoveFromSale = async (creditId) => {
@@ -215,7 +213,7 @@ const BuyerDashboard = () => {
                   <li key={credit.id} className="flex justify-between items-center py-3 pr-4 pl-3 text-sm">
                     <div className="flex flex-1 items-center w-0">
                       <span className="flex-1 ml-2 w-0 truncate">
-                        {credit.name} - Amount: {credit.amount}, Price: ${credit.price}
+                        {credit.name} - Amount: {credit.amount}, Price: {credit.price} ETH
                       </span>
                     </div>
                     <div className="flex-shrink-0 ml-4">
@@ -260,7 +258,7 @@ const BuyerDashboard = () => {
                     >
                       <div className="flex flex-1 items-center w-0">
                         <span className="flex-1 ml-2 w-0 truncate">
-                          {credit.name} - Amount: {credit.amount}, Price: ${credit.price}
+                          {credit.name} - Amount: {credit.amount}, Price: {credit.price} ETH
                         </span>
                       </div>
 

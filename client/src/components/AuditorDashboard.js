@@ -39,6 +39,7 @@ const AuditorDashboard = () => {
   }, []);
 
   const handleAudit = (creditId) => {
+    setAuditReason("");
     setAuditCreditId(creditId === auditCreditId ? null : creditId);
   };
 
@@ -54,6 +55,7 @@ const AuditorDashboard = () => {
 
       setAuditCreditId(null);
       setAssignedCredits((prevCredits) => prevCredits.filter((credit) => credit.id !== creditId));
+      
     } catch (error) {
       console.error("Error in audit:", error);
       throw error;
