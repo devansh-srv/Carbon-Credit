@@ -34,5 +34,6 @@ export const verifyBeforeExpire = (verificationData) => api.post(`/NGO/expire-re
 export const getAssignedCredits = () => api.get('/auditor/credits');
 export const auditCreditApi = (auditData) => api.patch(`/auditor/audit/${auditData["creditId"]}`, auditData);
 export const checkAuditorsNumber = (amount) => api.get(`/NGO/audit-req`, { params: { amount } });
+export const getCreditDetailsAPI = (creditId) => api.get(`/buyer/credits/${creditId}`);
 
 export default api;

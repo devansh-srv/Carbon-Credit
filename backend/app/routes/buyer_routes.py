@@ -217,3 +217,33 @@ def download_certificate(creditId):
         "filename":f"Carbon_Credit_Certificate_{purchased_credit.id}.pdf",
         "pdf_base64":base64.b64encode(output_buffer.getvalue()).decode('utf-8')
     })
+
+@buyer_bp.route('/api/buyer/credits/<int:credit_id>', methods=['GET'])
+@jwt_required()
+def get_credit_details(credit_id):
+    try:
+        credit = Credit.query.get_or_404(credit_id)
+        # Fetch usernames for auditors
+        auditors = credit.auditors or []
+        auditor_users = User.query.filter(User.id.in_(auditors)).all()
+        auditor_usernames = {user.id: user.username for user in auditor_users}
+        # Map auditor IDs to usernames, preserving order
+        auditor_list = [
+            {"id": auditor_id, "username": auditor_usernames.get(auditor_id, "Unknown")}
+            for auditor_id in auditors
+        ]
+
+        return jsonify({
+            "id": credit.id,
+            "name": credit.name,
+            "amount": credit.amount,
+            "price": credit.price,
+            "is_active": credit.is_active,
+            "is_expired": credit.is_expired,
+            "creator_id": credit.creator_id,
+            "docu_url": credit.docu_url,
+            "auditors": auditor_list,  # Return list of {id, username}
+            "req_status": credit.req_status
+        })
+    except Exception as e:
+        return jsonify({"error": "Credit not found"}), 404
