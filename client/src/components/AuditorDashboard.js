@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { getAssignedCredits, auditCreditApi } from '../api/api';
 import { CC_Context } from "../context/SmartContractConnector.js";
+import Swal from 'sweetalert2';
 
 const LoadingCredit = () => (
   <li className="flex justify-between items-center py-3 pr-4 pl-3 text-sm animate-pulse">
@@ -38,6 +39,14 @@ const AuditorDashboard = () => {
     fetchAllCredits();
   }, []);
 
+  const handleAuditError = () => {
+    Swal.fire({
+            icon: 'error',
+            title: 'Audit Rejected',
+            html: 'Possible Reasons:<br><br>1. Check MetaMask account<br>2. You are the owner<br>3. Credit already audited'
+          });
+  }
+
   const handleAudit = (creditId) => {
     setAuditReason("");
     setAuditCreditId(creditId === auditCreditId ? null : creditId);
@@ -58,7 +67,8 @@ const AuditorDashboard = () => {
       
     } catch (error) {
       console.error("Error in audit:", error);
-      throw error;
+      handleAuditError();
+      // throw error;
     }
   };
 
@@ -76,7 +86,9 @@ const AuditorDashboard = () => {
       setAssignedCredits((prevCredits) => prevCredits.filter((credit) => credit.id !== creditId));
     } catch (error) {
       console.error("Error in audit:", error);
-      throw error;
+      handleAuditError();
+      // throw error;
+      
     }
   };
 
@@ -109,7 +121,7 @@ const AuditorDashboard = () => {
                   <li key={credit.id} className="flex justify-between items-center py-3 pr-4 pl-3 text-sm">
                     <div className="flex flex-1 items-center w-0">
                       <span className="flex-1 ml-2 w-0 truncate">
-                        {credit.name} - Amount: {credit.amount}, Price: ${credit.price}
+                        {credit.name} - Amount: {credit.amount}, Price: {credit.price} ETH
                       </span>
                     </div>
                     <div className="flex-shrink-0 ml-4">

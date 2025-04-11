@@ -3,7 +3,7 @@ import { CC_Context } from "../../context/SmartContractConnector.js";
 import { Loader2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import Swal from 'sweetalert2';
-import { createNGOCredit, getNGOCredits } from '../../api/api';
+import { createNGOCredit, getNGOCredits, checkAuditorsNumber } from '../../api/api';
 
 const CreateCreditForm = ({ setMyCredits }) => {
   const { generateCredit, getNextCreditId, requestAudit } = useContext(CC_Context);
@@ -75,12 +75,31 @@ const CreateCreditForm = ({ setMyCredits }) => {
 
   const handleCreateCredit = async (e) => {
     e.preventDefault();
-    if (!newCredit.name || !newCredit.amount || !newCredit.price) {
+    if (!newCredit.name || !newCredit.amount || !newCredit.price || !newCredit.auditFees) {
       alert("Please fill in all fields!");
       return;
     }
 
+    if(newCredit.auditFees < (newCredit.amount * 0.01 * 0.01)){
+      Swal.fire({
+        icon: "warning",
+        text: "Please give the minimum audit fees" 
+      })
+
+      return;
+    }
+
+    if(newCredit.price <= 0){
+      Swal.fire({
+        icon: "warning",
+        text: "Add some price !" 
+      })
+      return;
+    }
+
     try {
+      const checkAuditors = await checkAuditorsNumber(newCredit.amount);
+      console.log(checkAuditors);
       setPendingCr(true);
       const newCreditId = await getNextCreditId();
       const updatedCredit = { ...newCredit, creditId: Number(newCreditId), secure_url: docUrl };
@@ -95,7 +114,12 @@ const CreateCreditForm = ({ setMyCredits }) => {
 
       setNewCredit({ name: "", amount: "", price: "", creditId: "", auditFees: '', secure_url: '' });
     } catch (error) {
-      console.error("Failed to create credit:", error);
+      console.error("Failed to create credit:", error.response.data["message"]);
+      Swal.fire({
+        icon: "error",
+        title: "Failed Credit request",
+        text: `${error.response.data["message"]}`,
+      });
     } finally {
       setPendingCr(false);
     }

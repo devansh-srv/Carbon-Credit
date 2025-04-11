@@ -137,7 +137,7 @@ def get_transactions():
 
 @NGO_bp.route('/api/NGO/expire-req', methods=['POST'])
 @jwt_required()
-def check_request():
+def check_expire_request():
     data = request.json
 
     current_user = get_current_user()
@@ -155,3 +155,26 @@ def check_request():
     if bcrypt.check_password_hash(user.password, data['password']):
         return jsonify({"message": "User verified succesfully! can proceed to expire credit"}), 200
     return jsonify({"message": "Invalid credentials"}), 401
+
+@NGO_bp.route('/api/NGO/audit-req', methods=['GET'])
+@jwt_required()
+def check_audit_request():
+    auditors = User.query.filter_by(role = 'auditor').all()
+    num_auditors = len(auditors)
+    print("auditors avail:",num_auditors)
+
+    carbon_amount = request.args.get('amount')
+    if not carbon_amount:
+        return jsonify({"message": "Missing 'amount' parameter"}), 400
+
+    try:
+        carbon_amount = int(carbon_amount)
+    except ValueError:
+        return jsonify({"message": "'amount' must be an integer"}), 400
+    
+    req_auditors = numberOfAuditors(int(carbon_amount))
+
+    if num_auditors < req_auditors:
+        return jsonify({"message": f"Not Enough Auditors for {carbon_amount} tons of carbon. Maybe split the credit !"}), 500
+    
+    return jsonify({"message": f"Enough auditors for the credit"}), 200

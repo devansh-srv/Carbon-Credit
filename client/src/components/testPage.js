@@ -94,7 +94,7 @@ const TestPage = () => {
         }
 
         // Convert the price from wei to ether for display and use
-        // const priceInEther = ethers.formatEther(details.price);
+        const priceInEther = ethers.formatEther(details.price);
         
         // Use the original price from the credit details
         setSalePrice(details.price)

@@ -17,7 +17,8 @@ const MyCreditsList = ({ credits, setCredits, isLoading }) => {
     pending: true,
     accepted: true,
     rejected: true,
-    forSale: true
+    forSale: true,
+    expired: true 
   });
 
   // Toggle section visibility
@@ -34,9 +35,10 @@ const MyCreditsList = ({ credits, setCredits, isLoading }) => {
     
     return {
       pending: credits.filter(credit => credit.req_status === 1),
-      accepted: credits.filter(credit => credit.req_status === 2 && credit.score > 0),
+      accepted: credits.filter(credit => credit.req_status === 2 && credit.score > 0 && !credit.is_expired),
       rejected: credits.filter(credit => credit.req_status === 2 && credit.score <= 0),
-      forSale: credits.filter(credit => credit.req_status === 3)
+      forSale: credits.filter(credit => credit.req_status === 3 && !credit.is_expired),
+      expired: credits.filter(credit => credit.is_expired) 
     };
   }, [credits]);
 
@@ -65,6 +67,7 @@ const MyCreditsList = ({ credits, setCredits, isLoading }) => {
   };
 
   const openModal = (credit) => {
+    
     setSelectedCredit(credit);
     setModalVisible(true);
   };
@@ -173,7 +176,10 @@ const MyCreditsList = ({ credits, setCredits, isLoading }) => {
   };
 
   // Function to get status border style - using inline style
-  const getStatusBorderStyle = (reqStatus, score) => {
+  const getStatusBorderStyle = (reqStatus, score, isExpired) => {
+    // If expired, use a special style
+    if (isExpired) return { borderLeft: '4px solid #415e02' }; // Green for expired
+    
     // Use inline styles for borders to avoid potential CSS conflicts
     if (reqStatus === 1) return { borderLeft: '4px solid #FBBF24' }; // Yellow
     if (reqStatus === 2) {
@@ -187,7 +193,7 @@ const MyCreditsList = ({ credits, setCredits, isLoading }) => {
   const renderCreditItem = (credit) => {
     // Merge background color style with border style
     const listItemStyle = {
-      ...getStatusBorderStyle(credit.req_status, credit.score),
+      ...getStatusBorderStyle(credit.req_status, credit.score, credit.is_expired),
       backgroundColor: credit.is_expired ? '#D4EDDA' : 'transparent'
     };
     
@@ -329,6 +335,7 @@ const MyCreditsList = ({ credits, setCredits, isLoading }) => {
             {renderSection("Accepted Requests", categorizedCredits.accepted, "accepted", "#10B981")}
             {renderSection("Rejected Requests", categorizedCredits.rejected, "rejected", "#EF4444")}
             {renderSection("For Sale", categorizedCredits.forSale, "forSale", "#3B82F6")}
+            {renderSection("Expired Credits", categorizedCredits.expired, "expired", "#415e02")}
           </div>
         ) : (
           <div className="rounded-md border border-gray-200 p-4 text-center text-gray-500">

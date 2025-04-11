@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { getBuyerCredits, purchaseCredit, sellCreditApi, removeSaleCreditApi, getPurchasedCredits, generateCertificate, downloadCertificate } from '../api/api';
 import { CC_Context } from "../context/SmartContractConnector.js";
 import { ethers } from "ethers";
-import { Eye, EyeClosed, Loader2 } from 'lucide-react';
+import { Eye, EyeClosed, Loader2, File } from 'lucide-react';
 
 const LoadingCredit = () => (
   <li className="flex justify-between items-center py-3 pr-4 pl-3 text-sm animate-pulse">
@@ -72,15 +72,17 @@ const BuyerDashboard = () => {
     try {
       setError(null);
       setPendingTx(creditId);
-
+  
       const credit = await getCreditDetails(creditId);
-
-      // Convert the price from wei to ether for the transaction
       const priceInEther = ethers.formatEther(credit.price);
+  
       console.log("id, price: ", creditId, priceInEther);
-      await buyCredit(creditId, priceInEther);
-      await purchaseCredit({ credit_id: creditId, amount: 1 });
-      await fetchAllCredits(); // Refresh both available and purchased credits
+  
+      const receipt = await buyCredit(creditId, priceInEther);
+      // console.log(receipt);
+      await purchaseCredit({ credit_id: creditId, txn_hash: receipt.hash });
+  
+      await fetchAllCredits();
     } catch (error) {
       console.error('Failed to purchase credit:', error);
       setError('Failed to purchase credit. Please try again.');
@@ -88,6 +90,7 @@ const BuyerDashboard = () => {
       setPendingTx(null);
     }
   };
+  
 
   const handleGenerateCertificate = async (creditId) => {
     try {
@@ -216,28 +219,30 @@ const BuyerDashboard = () => {
                         {credit.name} - Amount: {credit.amount}, Price: {credit.price} ETH
                       </span>
                     </div>
-                    <div className="flex-shrink-0 ml-4">
-                      <>
+                    <div className="flex-shrink-0 ml-4 flex items-center space-x-2">
+                      {credit.secure_url && (
                         <button
-                          type='button'
+                          type="button"
                           onClick={() => window.open(credit.secure_url, '_blank')}
-                          className="py-2 px-4 mr-4 font-sans text-white bg-blue-500 rounded hover:bg-blue-800">
-                          View Project Documents
-                        </button>
-                        <button
-                          onClick={() => handleBuyCredit(credit.id)}
-                          className="btn btn-secondary"
-                          disabled={credit.amount <= 0 || pendingTx === credit.id}
+                          className="py-2 px-2 text-white bg-blue-500 rounded hover:bg-blue-800"
                         >
-                          {pendingTx === credit.id ? (
-                            <span className='flex'>
-                              <Loader2 className="mr-2 w-4 h-4 animate-spin" />
-                              Processing...
-                            </span>
-                          ) : (
-                            credit.amount > 0 ? 'Buy' : 'Out of Stock'
-                          )}
-                        </button></>
+                          <File size={20} />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleBuyCredit(credit.id)}
+                        className="btn btn-secondary"
+                        disabled={credit.amount <= 0 || pendingTx === credit.id}
+                      >
+                        {pendingTx === credit.id ? (
+                          <span className="flex items-center">
+                            <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                            Processing...
+                          </span>
+                        ) : (
+                          credit.amount > 0 ? 'Buy' : 'Out of Stock'
+                        )}
+                      </button>
                     </div>
                   </li>
                 ))}

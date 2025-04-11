@@ -34,6 +34,9 @@ def purchase_credit():
     data = request.json
     if not data or 'credit_id' not in data:
         return jsonify({"message": "Missing credit_id"}), 400
+    
+    if 'txn_hash' not in data:
+        return jsonify({"message": "Missing txn_hash"}), 400
 
     # Retrieve the credit
     credit = Credit.query.get(data['credit_id'])
@@ -55,7 +58,8 @@ def purchase_credit():
         user_id=user.id,
         credit_id=credit.id,
         amount=credit.amount,
-        creator_id=credit.creator_id
+        creator_id=credit.creator_id,
+        txn_hash=data['txn_hash']
     )
 
     # Record the transaction

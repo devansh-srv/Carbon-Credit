@@ -5,6 +5,7 @@ def generate_certificate_data(purchase_id, user, purchased_credit, credit):
         "credit_name": credit.name,
         "amount": purchased_credit.amount,
         "purchase_date": purchased_credit.purchase_date.strftime("%Y-%m-%d"),
+        "transaction_hash": purchased_credit.txn_hash,
         "certificate_html": f"""
             <div style="
                 border: 4px double #2c3e50; 
@@ -35,6 +36,11 @@ def generate_certificate_data(purchase_id, user, purchased_credit, credit):
                     height: 15px; 
                     background: linear-gradient(to right, #3498db, #2ecc71);
                 "></div>
+                
+                <!-- Logo -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://i.ibb.co/TDn711NW/leaf-8993153.png" alt="Website Logo" style="max-width: 50px; height: auto;">
+                </div>
 
                 <!-- Certificate Content -->
                 <h1 style="
@@ -78,9 +84,18 @@ def generate_certificate_data(purchase_id, user, purchased_credit, credit):
                     <p style="
                         border-top: 1px solid #bdc3c7; 
                         padding-top: 15px; 
+                        margin-bottom: 15px;
                         display: inline-block;
-                        border-bottom: 1px solid #bdc3c7;
+                        word-break: break-all;
+                        max-width: 90%;
+                    ">
+                        Transaction Hash: {purchased_credit.txn_hash}
+                    </p>
+                    <p style="
                         padding-bottom: 15px;
+                        border-bottom: 1px solid #bdc3c7;
+                        display: inline-block;
+                        width: 90%
                     ">
                         Certificate ID: CC-{purchase_id}-{user.id}-{credit.id-1}
                     </p>

@@ -10,6 +10,7 @@ class PurchasedCredit(db.Model):
     purchase_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     is_expired = db.Column(db.Boolean, default=False)
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # Reference users.id directly
+    txn_hash = db.Column(db.String, nullable=False)
     
     user = db.relationship('User', foreign_keys=[user_id], backref='purchased_credits')
     credit = db.relationship('Credit', backref='purchases')
