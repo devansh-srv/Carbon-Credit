@@ -8,3 +8,4 @@ python-dotenv
 psycopg2
 gunicorn==19.7.1
 requests
+redis

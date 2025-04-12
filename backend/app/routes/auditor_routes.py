@@ -5,8 +5,10 @@ from app.models.credit import Credit
 from app.models.request import Request
 from app.models.transaction import PurchasedCredit, Transactions 
 from app.models.user import User
+from app.utilis.redis import get_redis
 import json
 auditor_bp = Blueprint('auditor', __name__)
+# redis_client = get_redis()
 def get_current_user():
     try:
         return json.loads(get_jwt_identity())
@@ -19,15 +21,14 @@ def manage_credits():
     current_user = get_current_user()
     if current_user.get('role') != 'auditor':
         return jsonify({"message": "Unauthorized"}), 403
-
     user = User.query.filter_by(username=current_user.get('username')).first()
-
+    # key = user.username
     requests = Request.query.filter(Request.auditors.contains([user.id])).all()
     
     credit_ids = [r.credit_id for r in requests]
-    credits = Credit.query.filter(Credit.id.in_(credit_ids)).all()
 
-    return jsonify([{
+    credits = Credit.query.filter(Credit.id.in_(credit_ids)).all()
+    data = [{
         "id": credit.id,
         "name": credit.name,
         "amount": credit.amount,
@@ -35,7 +36,8 @@ def manage_credits():
         "is_active": credit.is_active,
         "is_expired": credit.is_expired,
         "secure_url": credit.docu_url
-    }for credit in credits]), 200
+    }for credit in credits]
+    return jsonify(data), 200
 
 @auditor_bp.route('/api/auditor/audit/<int:credit_id>', methods=['PATCH'])
 @jwt_required()

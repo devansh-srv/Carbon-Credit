@@ -4,6 +4,7 @@ from app.models.user import User
 from app.models.credit import Credit
 from app.models.transaction import PurchasedCredit
 from app.models.transaction import Transactions
+from app.utilis.redis import get_redis
 from app.utilis.certificate_generator import generate_certificate_data
 import json
 import io
@@ -12,6 +13,7 @@ from weasyprint import HTML
 from app import db
 
 buyer_bp = Blueprint('buyer_bp', __name__)
+redis_client = get_redis()
 def get_current_user():
     try:
         return json.loads(get_jwt_identity())
@@ -21,8 +23,25 @@ def get_current_user():
 @buyer_bp.route('/api/buyer/credits', methods=['GET'])
 @jwt_required()
 def buyer_credits():
+    key = "buyer_credits"
+    if redis_client:
+        try:
+            cached_credits = redis_client.get(key)
+            if cached_credits:
+                print("cache hit")
+                return jsonify(json.loads(cached_credits))
+            else:
+                print("cache miss")
+        except Exception as e:
+            print(f"redis get client error: {e}")
     credits = Credit.query.filter_by(is_active =True).all()
-    return jsonify([{"id": c.id, "name": c.name, "amount": c.amount, "price": c.price,"creator":c.creator_id, "secure_url": c.docu_url} for c in credits])
+    data = [{"id": c.id, "name": c.name, "amount": c.amount, "price": c.price,"creator":c.creator_id, "secure_url": c.docu_url} for c in credits]
+    if redis_client:
+        try:
+            redis_client.set(key, json.loads(data))
+        except:
+            pass
+    return jsonify(data)
 
 @buyer_bp.route('/api/buyer/purchase', methods=['POST'])
 @jwt_required()
@@ -34,7 +53,7 @@ def purchase_credit():
     data = request.json
     if not data or 'credit_id' not in data:
         return jsonify({"message": "Missing credit_id"}), 400
-    
+    # print(data) 
     if 'txn_hash' not in data:
         return jsonify({"message": "Missing txn_hash"}), 400
 
@@ -59,7 +78,6 @@ def purchase_credit():
         credit_id=credit.id,
         amount=credit.amount,
         creator_id=credit.creator_id,
-        txn_hash=data['txn_hash']
     )
 
     # Record the transaction
@@ -67,9 +85,15 @@ def purchase_credit():
         buyer_id=user.id,
         credit_id=credit.id,
         amount=credit.amount,
-        total_price=credit.price
+        total_price=credit.price,
+        txn_hash=data['txn_hash']
     )
-
+    key = "buyer_credits"
+    if redis_client:
+        try:
+            redis_client.delete(key)
+        except Exception as e:
+            print(f"redis get client error: {e}")
     # Update the credit to inactive
     credit.is_active = False
 
@@ -137,6 +161,15 @@ def get_purchased_credits():
         return jsonify({"message": "Invalid token"}), 401
 
     user = User.query.filter_by(username=current_user['username']).first()
+    key = user.username
+    if redis_client:
+        try:
+            cached_purchased = redis_client.get(key)
+            if cached_purchased:
+                return jsonify(json.loads(cached_purchased)), 200
+        except Exception as e:
+            print(f"redis get client error: {e}")
+
     purchased_credits = PurchasedCredit.query.filter_by(user_id=user.id).all()
     credits = []
     for pc in purchased_credits:
@@ -155,7 +188,12 @@ def get_purchased_credits():
                 "email": creator.email
             } if creator else None
         })
-    return jsonify(credits)
+        if redis_client:
+            try:
+                redis_client.set(key,json.dumps(credits),ex=1)
+            except:
+                pass
+    return jsonify(credits), 200
 
 @buyer_bp.route('/api/buyer/generate-certificate/<int:creditId>', methods=['GET'])
 @jwt_required()
@@ -172,8 +210,12 @@ def generate_certificate(creditId):
     credit = Credit.query.get(purchased_credit.credit_id)
     if credit is None:
         return jsonify({"message":"No such credit found"}),404
+
+    transaction = Transactions.query.get(purchased_credit.credit_id)
+    if transaction is None:
+        return jsonify({"message": "Respective transaction not found"}), 404
     
-    certificate_data = generate_certificate_data(purchased_credit.id, user, purchased_credit, credit) if credit.is_expired else None
+    certificate_data = generate_certificate_data(purchased_credit.id, user, purchased_credit, credit, transaction) if credit.is_expired else None
     if certificate_data is None:
         return jsonify({"message":f"No credit with {credit.id} has expired"}), 404
     
@@ -193,9 +235,12 @@ def download_certificate(creditId):
     credit = Credit.query.get(purchased_credit.credit_id)
     if credit is None:
         return jsonify({"message":"No such credit found"}),404
-    creator = User.query.get(purchased_credit.creator_id) if purchased_credit.creator_id else None
+    transaction = Transactions.query.get(purchased_credit.credit_id)
+    if transaction is None:
+        return jsonify({"message": "Respective transaction not found"}), 404
+    # creator = User.query.get(purchased_credit.creator_id) if purchased_credit.creator_id else None
     
-    certificate_data = generate_certificate_data(purchased_credit.id, user, purchased_credit, credit) if credit.is_expired else None
+    certificate_data = generate_certificate_data(purchased_credit.id, user, purchased_credit, credit, transaction) if credit.is_expired else None
     if certificate_data is None:
         return jsonify({"message":f"No credit with {credit.id} has expired"}), 404
     

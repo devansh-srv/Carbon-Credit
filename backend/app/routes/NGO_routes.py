@@ -5,10 +5,12 @@ from app.models.credit import Credit
 from app.models.request import Request
 from app.models.transaction import PurchasedCredit, Transactions
 from app.models.user import User
+from app.utilis.redis import get_redis
 import random
 import json
 
 NGO_bp = Blueprint('NGO', __name__)
+redis_client = get_redis()
 def get_current_user():
     try:
         return json.loads(get_jwt_identity())
@@ -27,8 +29,19 @@ def manage_credits():
 
     user = User.query.filter_by(username=current_user.get('username')).first()
 
+    key = user.username
     # Ensure only credits created by this NGO are visible
     if request.method == 'GET':
+        if redis_client:
+            try:
+                cached_credits = redis_client.get(key)
+                if cached_credits:
+                    print("cache hit")
+                    return jsonify(json.loads(cached_credits))
+                else:
+                    print("cache miss")
+            except Exception as e:
+                print(f"redis get client error: {e}")
         credits = Credit.query.filter_by(creator_id=user.id).order_by(Credit.id.asc()).all()
         data = []
         for c in credits:
@@ -47,12 +60,18 @@ def manage_credits():
                 "auditor_left": len(req.auditors) if req and req.auditors else 0,
                 "score": req.score if req else 0
             })
+        redis_client.set(key, json.dumps(data))
         return jsonify(data), 200
 
     # Allow the NGO to create new credits
     if request.method == 'POST':
         
-        
+        if redis_client:
+            try:
+                cached_credits = redis_client.get(key)
+                redis_client.delete(key)
+            except:
+                pass
         #do something regarding the amount 
         data = request.json
 
@@ -120,7 +139,17 @@ def get_transactions():
     current_user = get_current_user()
     if current_user.get('role') != 'NGO':
         return jsonify({"message": "Unauthorized"}), 403
-
+    key = current_user.get('username')+"trans"
+    if redis_client:
+        try:
+            cached_txns = redis_client.get(key)
+            if cached_txns:
+                print("Cache hit")
+                return jsonify(json.loads(cached_txns)), 200
+            else:
+                print("Cache miss")
+        except Exception as e:
+            print(f"redis get client error: {e}")
     transactions = Transactions.query.order_by(Transactions.timestamp.desc()).all()
     transaction_list = []
     for t in transactions:
@@ -130,8 +159,10 @@ def get_transactions():
             "credit": t.credit_id,
             "amount": t.amount,
             "total_price": t.total_price,
-            "timestamp": t.timestamp.isoformat()
+            "timestamp": t.timestamp.isoformat(),
+            "txn_hash": t.txn_hash
         })
+        redis_client.set(key,json.dumps(transaction_list),ex=1)
     return jsonify(transaction_list)
 
 

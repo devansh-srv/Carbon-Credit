@@ -1,11 +1,11 @@
-def generate_certificate_data(purchase_id, user, purchased_credit, credit):
+def generate_certificate_data(purchase_id, user, purchased_credit, credit, transaction):
     return {
         "certificate_id": f"CC-{purchase_id}-{user.id}-{credit.id-1}",
         "buyer_name": user.username,
         "credit_name": credit.name,
         "amount": purchased_credit.amount,
         "purchase_date": purchased_credit.purchase_date.strftime("%Y-%m-%d"),
-        "transaction_hash": purchased_credit.txn_hash,
+        "transaction_hash": transaction.txn_hash,
         "certificate_html": f"""
             <div style="
                 border: 4px double #2c3e50; 
@@ -89,7 +89,7 @@ def generate_certificate_data(purchase_id, user, purchased_credit, credit):
                         word-break: break-all;
                         max-width: 90%;
                     ">
-                        Transaction Hash: {purchased_credit.txn_hash}
+                        Transaction Hash: {transaction.txn_hash}
                     </p>
                     <p style="
                         padding-bottom: 15px;

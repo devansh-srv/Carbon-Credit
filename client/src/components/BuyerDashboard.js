@@ -9,15 +9,15 @@ import Swal from 'sweetalert2';
 // Modular Details Button Component
 const DetailsButton = ({ creditId }) => {
   const navigate = useNavigate();
-  
+
   const handleViewDetails = () => {
     navigate(`/credits/${creditId}`);
   };
-  
+
   return (
     <button
       onClick={handleViewDetails}
-      className="p-2 text-white bg-indigo-500 rounded-xl hover:bg-indigo-600 flex items-center justify-center"
+      className="flex justify-center items-center p-2 text-white bg-indigo-500 rounded-xl hover:bg-indigo-600"
     >
       <Info size={16} />
     </button>
@@ -75,7 +75,7 @@ const BuyerDashboard = () => {
 
       // setPurchasedCredits(purchasedResponse.data);
     } catch (error) {
-      console.error('Failed to fetch credits:', error);
+      console.error('Failed to fetch credits:', error?.message);
       setError('Failed to fetch credits. Please try again.');
     } finally {
       setIsLoading(false);
@@ -90,16 +90,16 @@ const BuyerDashboard = () => {
     try {
       setError(null);
       setPendingTx(creditId);
-  
+
       const credit = await getCreditDetails(creditId);
       const priceInEther = ethers.formatEther(credit.price);
-  
+
       console.log("id, price: ", creditId, priceInEther);
-  
+
       const receipt = await buyCredit(creditId, priceInEther);
       // console.log(receipt);
       await purchaseCredit({ credit_id: creditId, txn_hash: receipt.hash });
-  
+
       await fetchAllCredits();
     } catch (error) {
       console.error('Failed to purchase credit:', error);
@@ -108,7 +108,7 @@ const BuyerDashboard = () => {
       setPendingTx(null);
     }
   };
-  
+
   const handleGenerateCertificate = async (creditId) => {
     try {
       setError(null);
@@ -142,7 +142,7 @@ const BuyerDashboard = () => {
       setError('Failed to download certificate. Please try again.');
     }
   }
-  
+
   const handleSellInput = (creditId) => {
     setPurchasedCredits((prevCredits) =>
       prevCredits.map((credit) =>
@@ -207,12 +207,12 @@ const BuyerDashboard = () => {
   };
 
   const handleSellError = () => {
-      Swal.fire({
-              icon: 'error',
-              title: 'Error !',
-              html: 'Possible Reasons:<br><br>1. Check MetaMask account is the one you bought with'
-            });
-    }
+    Swal.fire({
+      icon: 'error',
+      title: 'Error !',
+      html: 'Possible Reasons:<br><br>1. Check MetaMask account is the one you bought with'
+    });
+  }
 
   return (
     <div className="overflow-hidden bg-white bg-gradient-to-br from-blue-100 to-indigo-300 shadow sm:rounded-lg">
@@ -246,10 +246,10 @@ const BuyerDashboard = () => {
                         {credit.name} - Amount: {credit.amount}, Price: {credit.price} ETH
                       </span>
                     </div>
-                    <div className="flex-shrink-0 ml-4 flex items-center space-x-2">
+                    <div className="flex flex-shrink-0 items-center ml-4 space-x-2">
                       {/* Details button - added here */}
                       <DetailsButton creditId={credit.id} />
-                      
+
                       {credit.secure_url && (
                         <button
                           type="button"
@@ -299,7 +299,7 @@ const BuyerDashboard = () => {
                       <div className="flex flex-shrink-0 gap-2 items-center ml-4">
                         {/* Details button - added here */}
                         <DetailsButton creditId={credit.id} />
-                        
+
                         {/* View Project Documents button - aligned left */}
                         {credit.secure_url && (
                           <button
