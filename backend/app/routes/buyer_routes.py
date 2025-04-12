@@ -38,7 +38,7 @@ def buyer_credits():
     data = [{"id": c.id, "name": c.name, "amount": c.amount, "price": c.price,"creator":c.creator_id, "secure_url": c.docu_url} for c in credits]
     if redis_client:
         try:
-            redis_client.set(key, json.loads(data))
+            redis_client.set(key, json.dumps(data))
         except:
             pass
     return jsonify(data)
