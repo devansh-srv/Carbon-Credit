@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { CC_Context } from "../../context/SmartContractConnector.js";
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload, Tag, Hash, DollarSign, FileText } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import Swal from 'sweetalert2';
 import { createNGOCredit, getNGOCredits, checkAuditorsNumber } from '../../api/api';
@@ -37,33 +37,30 @@ const CreateCreditForm = ({ setMyCredits }) => {
     formData.append('file', selectedFile);
     formData.append('upload_preset', 'CARBON')
     try {
-    const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/upload`, {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/upload`, {
         method: 'POST',
         body: formData
-    });
-    const data = await response.json();
-    // console.log('File uploaded to Cloudinary: ', data);
-    console.log('secure_url: ', data['secure_url'])
-    setDocUrl(data['secure_url'])
-    console.log('docUrl: ', docUrl)
-    Swal.fire({
+      });
+      const data = await response.json();
+      setDocUrl(data['secure_url'])
+      Swal.fire({
         icon: "success",
         title: "File Uploaded",
         text: "Your file has been uploaded successfully.",
-    });
-    setIsFileConfirmed(true)
+      });
+      setIsFileConfirmed(true)
     }
     catch (err) {
-    console.error('Failed uploading file to cloudinary: ', err);
-    Swal.fire(
+      console.error('Failed uploading file to cloudinary: ', err);
+      Swal.fire(
         {
-        icon: "error",
-        title: "Upload failed",
-        text: "There was an error uploading your file. Please try again.",
+          icon: "error",
+          title: "Upload failed",
+          text: "There was an error uploading your file. Please try again.",
         }
-    )
+      )
     }
-}
+  }
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
@@ -85,7 +82,6 @@ const CreateCreditForm = ({ setMyCredits }) => {
         icon: "warning",
         text: "Please give the minimum audit fees" 
       })
-
       return;
     }
 
@@ -108,7 +104,6 @@ const CreateCreditForm = ({ setMyCredits }) => {
       await requestAudit(newCreditId, updatedCredit.auditFees);
       const response = await createNGOCredit(updatedCredit);
       
-      // Refetch the updated credit list after successful creation
       const updatedCredits = await getNGOCredits();
       setMyCredits(updatedCredits.data);
 
@@ -126,71 +121,160 @@ const CreateCreditForm = ({ setMyCredits }) => {
   };
 
   return (
-    <div className="py-5 px-4 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-      <dt className="text-sm font-medium text-gray-500">Create New Credit</dt>
-      <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-        <form onSubmit={handleCreateCredit} className="space-y-4">
-          {/* Input fields */}
-          <input className="input" type="text" name="name" placeholder="Credit Name" value={newCredit.name} onChange={handleInputChange} required />
-          <input className="input" type="number" name="amount" placeholder="Amount" value={newCredit.amount} onChange={handleInputChange} required />
-          <input className="input" type="number" name="price" placeholder="Price" value={newCredit.price} onChange={handleInputChange} required />
-          <input className="input" type="number" name="auditFees" placeholder={`Audit Fees min:${newCredit.amount * 0.01 * 0.01} ETH`} value={newCredit.auditFees} onChange={handleInputChange} required />
-          
-          {/* Dropzone */}
-          <div className="py-5 px-4 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Upload Project PDF</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <div {...getRootProps()} className="p-6 text-center rounded border-2 border-gray-400 border-dashed hover:border-blue-600">
-                    <input {...getInputProps()} />
-                    {isDragActive ? (
-                    <p>Drop the files here ...</p>
-                    ) : selectedFile ? (
-                    <>
-                        <p>Selected file: {selectedFile.name}</p>
-                        {isFileConfirmed ? (
-                        <p>File has been uploaded successfully.</p>
-                        ) : (
-                        <>
-                            <button
-                            type='button'
-                            onClick={onSubmit}
-                            className="py-2 px-4 font-sans text-white bg-green-500 rounded hover:bg-green-800">
-                            Confirm Upload
-                            </button>
-                            <button
-                            type='button'
-                            onClick={open}
-                            className="py-2 px-4 ml-2 font-sans text-white bg-blue-500 rounded hover:bg-blue-800">
-                            Upload another file
-                            </button>
-                        </>
-                        )}
-                    </>
-                    ) : (
-                    <>
-                        <p>Drag 'n' drop a PDF file here, or click to select one</p>
-                        <button
-                        type='button'
-                        onClick={open}
-                        className="py-2 px-4 font-sans text-black bg-blue-500 rounded hover:bg-blue-800">
-                        Upload Project File
-                        </button>
-                    </>
-                    )}
-                </div>
-                </dd>
+    <div className="p-4 bg-white rounded-md shadow-sm">
+      <h4 className="text-base font-medium text-gray-800 mb-3 flex items-center">
+        <FileText className="w-4 h-4 mr-1 text-cyan-500" />
+        Create Credit
+      </h4>
+      <form onSubmit={handleCreateCredit} className="space-y-3">
+        {/* Input Fields */}
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div className="relative">
+            <label className="block text-xs font-medium text-gray-600">Name</label>
+            <div className="mt-1 flex items-center">
+              <Tag className="absolute w-4 h-4 text-gray-400 ml-2" />
+              <input
+                type="text"
+                name="name"
+                placeholder="Credit name"
+                value={newCredit.name}
+                onChange={handleInputChange}
+                required
+                className="w-full pl-8 pr-2 py-1.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-cyan-300 focus:border-cyan-500 transition-colors"
+              />
             </div>
-          
-          <button type="submit" className="btn btn-primary">
-            {pendingCr ? (
-              <span className='flex'>
-                <Loader2 className="mr-2 w-4 h-4 animate-spin" />
-                Generating Credit...
-              </span>
-            ) : "Create Credit & Request Audit"}
-          </button>
-        </form>
-      </dd>
+          </div>
+          <div className="relative">
+            <label className="block text-xs font-medium text-gray-600">Amount</label>
+            <div className="mt-1 flex items-center">
+              <Hash className="absolute w-4 h-4 text-gray-400 ml-2" />
+              <input
+                type="number"
+                name="amount"
+                placeholder="Amount"
+                value={newCredit.amount}
+                onChange={handleInputChange}
+                required
+                className="w-full pl-8 pr-2 py-1.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-cyan-300 focus:border-cyan-500 transition-colors"
+              />
+            </div>
+          </div>
+          <div className="relative">
+            <label className="block text-xs font-medium text-gray-600">Price</label>
+            <div className="mt-1 flex items-center">
+              <DollarSign className="absolute w-4 h-4 text-gray-400 ml-2" />
+              <input
+                type="number"
+                name="price"
+                placeholder="Price"
+                value={newCredit.price}
+                onChange={handleInputChange}
+                required
+                className="w-full pl-8 pr-2 py-1.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-cyan-300 focus:border-cyan-500 transition-colors"
+              />
+            </div>
+          </div>
+          <div className="relative">
+            <label className="block text-xs font-medium text-gray-600">Audit Fees</label>
+            <div className="mt-1 flex items-center">
+              <FileText className="absolute w-4 h-4 text-gray-400 ml-2" />
+              <input
+                type="number"
+                name="auditFees"
+                placeholder={`Min: ${newCredit.amount * 0.01 * 0.01} ETH`}
+                value={newCredit.auditFees}
+                onChange={handleInputChange}
+                required
+                className="w-full pl-8 pr-2 py-1.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-cyan-300 focus:border-cyan-500 transition-colors"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Dropzone */}
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1 flex items-center">
+            <Upload className="w-3 h-3 mr-1 text-cyan-500" />
+            Project PDF
+          </label>
+          <div
+            {...getRootProps()}
+            className={`p-4 border-2 border-dashed rounded-md text-center transition-colors ${
+              isDragActive ? 'border-cyan-400 bg-emerald-50' : 'border-gray-200 bg-emerald-50'
+            } hover:border-cyan-400`}
+          >
+            <input {...getInputProps()} />
+            <div className="flex flex-col items-center">
+              <Upload className="w-5 h-5 text-gray-400 mb-1" />
+              {isDragActive ? (
+                <p className="text-xs text-gray-600">Drop here...</p>
+              ) : selectedFile ? (
+                <div className="space-y-1">
+                  <p className="text-xs text-gray-700 truncate max-w-[200px]">{selectedFile.name}</p>
+                  {isFileConfirmed ? (
+                    <p className="text-xs text-cyan-600 flex items-center">
+                      <FileText className="w-3 h-3 mr-1" />
+                      Uploaded
+                    </p>
+                  ) : (
+                    <div className="flex space-x-1">
+                      <button
+                        type="button"
+                        onClick={onSubmit}
+                        className="px-2 py-1 bg-cyan-500 text-white text-xs font-medium rounded flex items-center hover:bg-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-300 transition-colors"
+                      >
+                        <Upload className="w-3 h-3 mr-1" />
+                        Confirm
+                      </button>
+                      <button
+                        type="button"
+                        onClick={open}
+                        className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded flex items-center hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-300 transition-colors"
+                      >
+                        <FileText className="w-3 h-3 mr-1" />
+                        Replace
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  <p className="text-xs text-gray-600">Drop PDF or click to select</p>
+                  <button
+                    type="button"
+                    onClick={open}
+                    className="px-2 py-1 bg-cyan-500 text-white text-xs font-medium rounded flex items-center hover:bg-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-300 transition-colors"
+                  >
+                    <Upload className="w-3 h-3 mr-1" />
+                    Select
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={pendingCr}
+          className={`w-full px-3 py-1.5 bg-green-400 text-white text-sm font-medium rounded flex items-center justify-center ${
+            pendingCr ? 'opacity-50 cursor-not-allowed' : 'hover:bg-emerald-500'
+          } focus:outline-none focus:ring-1 focus:ring-cyan-300 transition-colors`}
+        >
+          {pendingCr ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin mr-1" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <FileText className="w-4 h-4 mr-1" />
+              Create & Audit
+            </>
+          )}
+        </button>
+      </form>
     </div>
   );
 };

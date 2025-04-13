@@ -64,7 +64,7 @@ const Login = ({ onLogin }) => {
         )}
 
         {showTestPrompt && (
-          <div className="flex fixed top-5 left-1/2 gap-4 items-center p-4 bg-white rounded-lg shadow-lg transform -translate-x-1/2">
+          <div className="flex fixed top-14 left-1/2 gap-4 items-center p-4 bg-white rounded-lg shadow-lg transform -translate-x-1/2">
             <span>Login as:</span>
             <button
               className="py-1 px-3 text-white bg-cyan-800 rounded-md"
