@@ -68,6 +68,10 @@ jobs:
           npx hardhat compile
           # npx hardhat test --verbose
 
+      # - name: Start Redis
+      #   run: |
+      #     docker run -d -p 6379:6379 redis
+      #
       - name: Install backend dependencies
         if: matrix.component == 'backend'
         run: |
@@ -76,8 +80,19 @@ jobs:
           source myenv/bin/activate
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
-          flask upgrade
+
+      # - name: Set up backend env
+      #   if: matrix.component == "backend"
+      #   run: |
+      #     echo "POSTGRES_URI=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+      #     echo "SKIP_REDIS=true" >> $GITHUB_ENV
+
+      # - name: Run DB migration
+      #   if: matrix.component == "backend"
+      #   run: |
+      #     cd backend
+      #     source myenv/bin/activate
+      #     flask db upgrade
 
       - name: Install Frontend dependencies
         if: matrix.component == 'frontend'
