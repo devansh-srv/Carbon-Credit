@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager,create_access_token, jwt_required,get_jwt_identity
 from flask_cors import CORS
@@ -10,13 +11,16 @@ from .utilis.redis import init_redis
 db = SQLAlchemy(engine_options=Config.SQLALCHEMY_ENGINE_OPTIONS)
 bcrypt = Bcrypt()
 jwt = JWTManager()
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config.from_object(Config)
     init_redis(app)
     CORS(app)
     db.init_app(app)
+    migrate.init_app(app,db)
     bcrypt.init_app(app)
     jwt.init_app(app)
     
