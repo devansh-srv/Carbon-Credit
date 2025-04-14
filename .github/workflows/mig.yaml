@@ -15,6 +15,10 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.13'
+      
+      - name: Start Redis
+        run: |
+          docker run -d -p 6379:6379
 
       - name: Install dependencies
         run: |
@@ -29,6 +33,14 @@ jobs:
           project_id: ${{ secrets.NEON_PROJECT_ID }}
           branch_name: migrate-${{ github.sha }}
           api_key: ${{ secrets.NEON_API_KEY }}
+          
+      - name: Create database in new branch
+        run: |
+          curl -X POST https://console.neon.tech/api/v2/projects/${{ secrets.NEON_PROJECT_ID }}/branches/${{ steps.create-branch.outputs.branch_id }}/databases \
+          -H "Authorization: Bearer ${{ secrets.NEON_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{"name": "Carbon_Cred"}'
+
 
       - name: Run migrations on Neon branch
         env:
