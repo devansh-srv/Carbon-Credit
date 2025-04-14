@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getCreditDetailsAPI } from '../api/api.js';
 import { ethers } from 'ethers';
+import { FaEthereum } from "react-icons/fa6";
 import { CC_Context } from '../context/SmartContractConnector.js';
 import { 
   FileText, 
@@ -13,7 +14,8 @@ import {
   X, 
   Link,
   CreditCard, 
-  Activity 
+  Activity,
+  Cloud
 } from 'lucide-react';
 
 const CreditDetails = () => {
@@ -97,160 +99,138 @@ const CreditDetails = () => {
         <h1 className="text-3xl font-bold text-gray-800">Credit Details <span className="text-emerald-500">#{creditId}</span></h1>
       </div>
       
-      {dbCredit && (
-        <div className="bg-white shadow-lg rounded-lg p-6 mb-8 border-l-4 border-green-400">
-          <div className="flex items-center mb-4">
-            <FileText className="h-6 w-6 text-emerald-500 mr-2" />
-            <h2 className="text-xl font-semibold text-gray-800">Database Information</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+      <div className="bg-white shadow-lg rounded-lg p-6 mb-8 border-l-4 border-emerald-500">
+        <div className="flex items-center mb-6">
+          <FileText className="h-6 w-6 text-emerald-500 mr-2" />
+          <h2 className="text-xl font-semibold text-gray-800">Carbon Credit Information</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+          {/* Name */}
+          {dbCredit && (
             <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <FileText className="h-5 w-5 text-green-400" />
+              <div className="bg-emerald-50 p-2 rounded-full mr-3">
+                <FileText className="h-5 w-5 text-emerald-500" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Name</p>
                 <p className="font-medium">{dbCredit.name}</p>
               </div>
             </div>
-            
-            <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <DollarSign className="h-5 w-5 text-green-400" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Amount</p>
-                <p className="font-medium">{dbCredit.amount}</p>
+          )}
+          
+          {/* Tons of Carbon */}
+          <div className="flex items-start">
+            <div className="bg-emerald-50 p-2 rounded-full mr-3">
+              <Cloud className="h-5 w-5 text-emerald-500" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Tons of Carbon</p>
+              <p className="font-medium">{dbCredit?.amount || ethers.formatEther(credit?.amount || '0')}</p>
+            </div>
+          </div>
+          
+          {/* Price */}
+          <div className="flex items-start">
+            <div className="bg-emerald-50 p-2 rounded-full mr-3">
+              <FaEthereum className="h-5 w-5 text-emerald-500" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Price</p>
+              <p className="font-medium">
+                {dbCredit?.price ? `${dbCredit.price} ETH` : credit ? `${ethers.formatEther(credit.price)} ETH` : 'N/A'}
+              </p>
+            </div>
+          </div>
+          
+          {/* Status */}
+          <div className="flex items-start">
+            <div className="bg-emerald-50 p-2 rounded-full mr-3">
+              <Activity className="h-5 w-5 text-emerald-500" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Status</p>
+              <div className="flex items-center">
+                <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                  (dbCredit?.is_active || credit?.forSale) ? 'bg-green-500' : 'bg-gray-400'
+                }`}></span>
+                <p className="font-medium">
+                  {(dbCredit?.is_active || credit?.forSale) ? 'For Sale' : 'Not For Sale'}
+                </p>
               </div>
             </div>
-            
-            <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <DollarSign className="h-5 w-5 text-green-400" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Price</p>
-                <p className="font-medium">${dbCredit.price}</p>
+          </div>
+          
+          {/* Expiration */}
+          <div className="flex items-start">
+            <div className="bg-emerald-50 p-2 rounded-full mr-3">
+              <Clock className="h-5 w-5 text-emerald-500" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Expiration</p>
+              <div className="flex items-center">
+                {(dbCredit?.is_expired || credit?.expired) ? (
+                  <X className="h-5 w-5 text-red-500 mr-1" />
+                ) : (
+                  <Check className="h-5 w-5 text-green-500 mr-1" />
+                )}
+                <p className="font-medium">
+                  {(dbCredit?.is_expired || credit?.expired) ? 'Expired' : 'Active'}
+                </p>
               </div>
             </div>
-            
+          </div>
+          
+          {/* Creator ID */}
+          {dbCredit?.creator_id && (
             <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <Activity className="h-5 w-5 text-green-400" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Status</p>
-                <div className="flex items-center">
-                  <span className={`inline-block w-2 h-2 rounded-full mr-2 ${dbCredit.is_active ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-                  <p className="font-medium">{dbCredit.is_active ? 'For Sale' : 'Not For Sale'}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <Clock className="h-5 w-5 text-green-400" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Expiration</p>
-                <div className="flex items-center">
-                  <span className={`inline-block w-2 h-2 rounded-full mr-2 ${dbCredit.is_expired ? 'bg-red-500' : 'bg-green-500'}`}></span>
-                  <p className="font-medium">{dbCredit.is_expired ? 'Expired' : 'Active'}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <User className="h-5 w-5 text-green-400" />
+              <div className="bg-emerald-50 p-2 rounded-full mr-3">
+                <User className="h-5 w-5 text-emerald-500" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Creator ID</p>
                 <p className="font-medium">{dbCredit.creator_id}</p>
               </div>
             </div>
-            
-            <div className="flex items-start col-span-2">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <Link className="h-5 w-5 text-green-400" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-gray-500">Document URL</p>
-                <a 
-                  href={dbCredit.docu_url} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-emerald-500 hover:text-emerald-600 font-medium truncate block"
-                >
-                  {dbCredit.docu_url}
-                </a>
-              </div>
+          )}
+          
+          
+          {/* Auditors */}
+          <div className="flex items-start">
+            <div className="bg-emerald-50 p-2 rounded-full mr-3">
+              <Shield className="h-5 w-5 text-emerald-500" />
             </div>
-            
-            <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <Shield className="h-5 w-5 text-green-400" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Auditors</p>
-                <p className="font-medium">
-                  {dbCredit.auditors?.length > 0
-                    ? dbCredit.auditors.map(auditor => auditor.username).join(', ')
-                    : 'None'}
-                </p>
-              </div>
+            <div>
+              <p className="text-sm text-gray-500">Auditors</p>
+              <p className="font-medium">
+                {dbCredit?.auditors?.length > 0
+                  ? dbCredit.auditors.map(auditor => auditor.username).join(', ')
+                  : credit ? credit.numOfAuditors.toString() : 'None'}
+              </p>
             </div>
-            
-            <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <Activity className="h-5 w-5 text-green-400" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Request Status</p>
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                  dbCredit.req_status === 'Approved' ? 'bg-green-100 text-green-800' :
-                  dbCredit.req_status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
-                  {dbCredit.req_status}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {credit && (
-        <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-emerald-500">
-          <div className="flex items-center mb-4">
-            <Activity className="h-6 w-6 text-emerald-500 mr-2" />
-            <h2 className="text-xl font-semibold text-gray-800">Blockchain Information</h2>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-            <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <DollarSign className="h-5 w-5 text-emerald-500" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Amount</p>
-                <p className="font-medium">{ethers.formatEther(credit.amount)} ETH</p>
-              </div>
+          {/* Request Status */}
+          <div className="flex items-start">
+            <div className="bg-emerald-50 p-2 rounded-full mr-3">
+              <Activity className="h-5 w-5 text-emerald-500" />
             </div>
-            
-            <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <DollarSign className="h-5 w-5 text-emerald-500" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Price</p>
-                <p className="font-medium">{ethers.formatEther(credit.price)} ETH</p>
-              </div>
+            <div>
+              <p className="text-sm text-gray-500">Request Status</p>
+              <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                (dbCredit?.req_status === 'Approved' || credit?.requestStatus === 'Approved') ? 'bg-green-100 text-green-800' :
+                (dbCredit?.req_status === 'Pending' || credit?.requestStatus === 'Pending') ? 'bg-yellow-100 text-yellow-800' :
+                'bg-red-100 text-red-800'
+              }`}>
+                {dbCredit?.req_status || credit?.requestStatus || 'Unknown'}
+              </span>
             </div>
-            
+          </div>
+          
+          {/* Owner */}
+          {credit?.owner && (
             <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
+              <div className="bg-emerald-50 p-2 rounded-full mr-3">
                 <User className="h-5 w-5 text-emerald-500" />
               </div>
               <div>
@@ -258,9 +238,12 @@ const CreditDetails = () => {
                 <p className="font-medium text-xs md:text-sm truncate max-w-xs">{credit.owner}</p>
               </div>
             </div>
-            
+          )}
+          
+          {/* Creator */}
+          {credit?.creator && (
             <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
+              <div className="bg-emerald-50 p-2 rounded-full mr-3">
                 <User className="h-5 w-5 text-emerald-500" />
               </div>
               <div>
@@ -268,69 +251,12 @@ const CreditDetails = () => {
                 <p className="font-medium text-xs md:text-sm truncate max-w-xs">{credit.creator}</p>
               </div>
             </div>
-            
+          )}
+          
+          {/* Audit Fees */}
+          {credit?.auditFees && (
             <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <Activity className="h-5 w-5 text-emerald-500" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">For Sale</p>
-                <div className="flex items-center">
-                  {credit.forSale ? (
-                    <Check className="h-5 w-5 text-green-500 mr-1" />
-                  ) : (
-                    <X className="h-5 w-5 text-red-500 mr-1" />
-                  )}
-                  <p className="font-medium">{credit.forSale ? 'Yes' : 'No'}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <Clock className="h-5 w-5 text-emerald-500" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Expiration</p>
-                <div className="flex items-center">
-                  {credit.expired ? (
-                    <X className="h-5 w-5 text-red-500 mr-1" />
-                  ) : (
-                    <Check className="h-5 w-5 text-green-500 mr-1" />
-                  )}
-                  <p className="font-medium">{credit.expired ? 'Expired' : 'Active'}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <Activity className="h-5 w-5 text-emerald-500" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Request Status</p>
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                  credit.requestStatus === 'Approved' ? 'bg-green-100 text-green-800' :
-                  credit.requestStatus === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
-                  {credit.requestStatus}
-                </span>
-              </div>
-            </div>
-            
-            <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <Shield className="h-5 w-5 text-emerald-500" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Number of Auditors</p>
-                <p className="font-medium">{credit.numOfAuditors.toString()}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
+              <div className="bg-emerald-50 p-2 rounded-full mr-3">
                 <DollarSign className="h-5 w-5 text-emerald-500" />
               </div>
               <div>
@@ -338,19 +264,38 @@ const CreditDetails = () => {
                 <p className="font-medium">{ethers.formatEther(credit.auditFees)} ETH</p>
               </div>
             </div>
-            
-            <div className="flex items-start">
-              <div className="bg-green-50 p-2 rounded-full mr-3">
-                <Activity className="h-5 w-5 text-emerald-500" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Audit Score</p>
-                <p className="font-medium">{credit.auditScore.toString()}</p>
-              </div>
-            </div>
+          )}
+      {/* Document URL */}
+      {dbCredit?.docu_url ? (
+        <div className="flex items-start ">
+          <div className="bg-emerald-50 p-2 rounded-full mr-3">
+            <Link className="h-5 w-5 text-emerald-500" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm text-gray-500">Document URL</p>
+            <a 
+              href={dbCredit.docu_url} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-emerald-500 hover:text-emerald-600 font-medium truncate block"
+            >
+              {dbCredit.docu_url}
+            </a>
+          </div>
+        </div>
+      ):(
+        <div className="flex items-start col-span-1 md:col-span-2 lg:col-span-3">
+          <div className="bg-emerald-50 p-2 rounded-full mr-3">
+            <Link className="h-5 w-5 text-emerald-500" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm text-gray-500">Document URL</p>
+            <p className="font-medium">Not available</p>
           </div>
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { CC_Context } from "../../context/SmartContractConnector.js";
-import { Loader2, Upload, Tag, Hash, DollarSign, FileText } from 'lucide-react';
+import { Loader2, Upload, Tag, Cloud, Currency, FileText,Bitcoin } from 'lucide-react';
+import { FaEthereum } from "react-icons/fa6";
 import { useDropzone } from 'react-dropzone';
 import Swal from 'sweetalert2';
 import { createNGOCredit, getNGOCredits, checkAuditorsNumber } from '../../api/api';
@@ -145,13 +146,13 @@ const CreateCreditForm = ({ setMyCredits }) => {
             </div>
           </div>
           <div className="relative">
-            <label className="block text-xs font-medium text-gray-600">Amount</label>
+            <label className="block text-xs font-medium text-gray-600">Tons of Carbon</label> {/* Changed label */}
             <div className="mt-1 flex items-center">
-              <Hash className="absolute w-4 h-4 text-gray-400 ml-2" />
+              <Cloud className="absolute w-4 h-4 text-gray-400 ml-2" /> {/* Changed icon */}
               <input
                 type="number"
                 name="amount"
-                placeholder="Amount"
+                placeholder="Tons of Carbon"
                 value={newCredit.amount}
                 onChange={handleInputChange}
                 required
@@ -162,7 +163,7 @@ const CreateCreditForm = ({ setMyCredits }) => {
           <div className="relative">
             <label className="block text-xs font-medium text-gray-600">Price</label>
             <div className="mt-1 flex items-center">
-              <DollarSign className="absolute w-4 h-4 text-gray-400 ml-2" />
+              <FaEthereum  className="absolute w-4 h-4 text-gray-400 ml-2" /> {/* Changed icon */}
               <input
                 type="number"
                 name="price"
@@ -190,7 +191,6 @@ const CreateCreditForm = ({ setMyCredits }) => {
             </div>
           </div>
         </div>
-
         {/* Dropzone */}
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1 flex items-center">

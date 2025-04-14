@@ -209,7 +209,7 @@ const AuditorDashboard = () => {
                         onChange={(e) => setAuditReason(e.target.value)}
                       ></textarea>
                       
-                      <div className="mt-4 flex gap-3">
+                      <div className="mt-4 flex gap-3 pl-[50%]">
                         <button 
                           className="flex-1 py-2 inline-flex justify-center items-center bg-green-400 text-white rounded-md hover:bg-green-500 transition-colors duration-200"
                           onClick={() => handleAcceptCredit(credit.id)}
