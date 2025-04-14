@@ -32,7 +32,7 @@ jobs:
         uses: neondatabase/create-branch-action@v5
         id: create-branch
         with:
-          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          project_id: ${{ env.NEON_PROJECT_ID }}
           branch_name: migrate-${{ github.sha }}
           api_key: ${{ secrets.NEON_API_KEY }}
 
@@ -46,6 +46,6 @@ jobs:
         if: always()
         uses: neondatabase/delete-branch-action@v3
         with:
-          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          project_id: ${{ env.NEON_PROJECT_ID }}
           branch: ${{ steps.create-branch.outputs.branch_id }}
           api_key: ${{ secrets.NEON_API_KEY }}
