@@ -7,6 +7,9 @@ on:
 jobs:
   test-migrations:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v3
 
@@ -35,7 +38,8 @@ jobs:
 
       - name: Run migrations on Neon branch
         env:
-          DATABASE_URL: ${{ steps.create-branch.outputs.db_url }}
+          POSTGRES_URI: ${{ steps.create-branch.outputs.db_url }}
+          FLASK_APP: run.py
         run: flask db upgrade
 
       - name: Clean up Neon branch
