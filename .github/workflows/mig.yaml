@@ -36,7 +36,8 @@ jobs:
           branch_name: migrate-${{ github.sha }}
           api_key: ${{ secrets.NEON_API_KEY }}
           database: Carbon_Cred
-          parent_branch: Carbon_Cred_owner
+          role: Carbon_Cred_owner
+          parent: main
 
       - name: Run migrations on Neon branch
         env:
