@@ -16,9 +16,16 @@ jobs:
         with:
           python-version: '3.13'
       
-      - name: Start Redis
-        run: |
-          docker run -d -p 6379:6379
+      - name: Setup redis
+        uses: supercharge/redis-github-action@1.7.0
+        with: 
+          redis-version: 7
+
+      - name: Install redis cli # so we can test the server
+        run: sudo apt-get install -y redis-tools
+
+      - name: Verify that redis is up
+        run: redis-cli ping
 
       - name: Install dependencies
         run: |
