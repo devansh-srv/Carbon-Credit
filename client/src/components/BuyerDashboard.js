@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { getBuyerCredits, purchaseCredit, sellCreditApi, removeSaleCreditApi, getPurchasedCredits, generateCertificate, downloadCertificate } from '../api/api';
 import { CC_Context } from "../context/SmartContractConnector.js";
 import { ethers } from "ethers";
-import { Eye, EyeClosed, Loader2, File, Info } from 'lucide-react';
+import { Eye, EyeOff, Loader2, File, Info, Download, ShoppingCart, XCircle, Tag, DollarSign, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
@@ -17,7 +17,7 @@ const DetailsButton = ({ creditId }) => {
   return (
     <button
       onClick={handleViewDetails}
-      className="flex justify-center items-center p-2 text-white bg-indigo-500 rounded-xl hover:bg-indigo-600"
+      className="flex justify-center items-center p-2 text-green-400 bg-white rounded-md hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors"
     >
       <Info size={16} />
     </button>
@@ -25,7 +25,7 @@ const DetailsButton = ({ creditId }) => {
 };
 
 const LoadingCredit = () => (
-  <li className="flex justify-between items-center py-3 pr-4 pl-3 text-sm animate-pulse">
+  <li className="flex justify-between items-center py-2 px-4 text-sm animate-pulse">
     <div className="flex-1">
       <div className="w-3/4 h-4 bg-gray-200 rounded"></div>
     </div>
@@ -54,7 +54,6 @@ const BuyerDashboard = () => {
     removeFromSale,
     buyCredit,
     currentAccount
-    // error 
   } = useContext(CC_Context);
 
   const fetchAllCredits = async () => {
@@ -72,8 +71,6 @@ const BuyerDashboard = () => {
 
       setPurchasedCredits(creditsWithSalePrice);
       setAvailableCredits(availableResponse.data);
-
-      // setPurchasedCredits(purchasedResponse.data);
     } catch (error) {
       console.error('Failed to fetch credits:', error?.message);
       setError('Failed to fetch credits. Please try again.');
@@ -97,7 +94,6 @@ const BuyerDashboard = () => {
       console.log("id, price: ", creditId, priceInEther);
 
       const receipt = await buyCredit(creditId, priceInEther);
-      // console.log(receipt);
       await purchaseCredit({ credit_id: creditId, txn_hash: receipt.hash });
 
       await fetchAllCredits();
@@ -124,7 +120,7 @@ const BuyerDashboard = () => {
   const handleHideCertificate = async () => {
     setCertificateData(null);
     setShowCertificate(true);
-  }
+  };
 
   const handleDownloadCertificate = async (creditId) => {
     try {
@@ -136,12 +132,11 @@ const BuyerDashboard = () => {
       downloadLink.href = linksource;
       downloadLink.download = fileName;
       downloadLink.click();
-
     } catch (error) {
       console.error("Failed to download Certificate: ", error);
       setError('Failed to download certificate. Please try again.');
     }
-  }
+  };
 
   const handleSellInput = (creditId) => {
     setPurchasedCredits((prevCredits) =>
@@ -168,14 +163,12 @@ const BuyerDashboard = () => {
       );
       setPurchasedCredits(updatedCredits);
 
-      // Log the updated credit
       const updatedCredit = updatedCredits.find((credit) => credit.id === creditId);
       console.log(`Credit put on sale with price: ${updatedCredit.salePrice}`);
 
-      // Call API to mark credit as on sale in the backend and contract
       await sellCredit(creditId, updatedCredit.salePrice);
-      const respose = await sellCreditApi({ credit_id: creditId, salePrice: updatedCredit.salePrice });
-      console.log(respose);
+      const response = await sellCreditApi({ credit_id: creditId, salePrice: updatedCredit.salePrice });
+      console.log(response);
       await fetchAllCredits();
     } catch (error) {
       console.error("Can't sale credit: ", error);
@@ -193,9 +186,8 @@ const BuyerDashboard = () => {
         )
       );
 
-      // Call API to remove the credit from sale in the backend
       await removeFromSale(creditId);
-      await removeSaleCreditApi({ credit_id: creditId })
+      await removeSaleCreditApi({ credit_id: creditId });
       console.log(`Removed credit ID ${creditId} from sale`);
       await fetchAllCredits();
     } catch (error) {
@@ -212,27 +204,29 @@ const BuyerDashboard = () => {
       title: 'Error !',
       html: 'Possible Reasons:<br><br>1. Check MetaMask account is the one you bought with'
     });
-  }
+  };
 
   return (
-    <div className="overflow-hidden bg-white bg-gradient-to-br from-blue-100 to-indigo-300 shadow sm:rounded-lg">
-      <div className="py-5 px-4 sm:px-6">
-        <h3 className="text-lg font-medium leading-6 text-gray-900">Buyer Dashboard</h3>
-        <p className="mt-1 max-w-2xl text-sm text-gray-500">View and purchase carbon credits</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-100">
+            <h3 className="text-xl font-semibold text-gray-800">Buyer Dashboard</h3>
+            <p className="mt-1 text-sm text-gray-500">View and manage your carbon credits</p>
+          </div>
 
-      {error && (
-        <div className="py-3 px-4 text-red-700 bg-red-50">
-          {error}
-        </div>
-      )}
+          {error && (
+            <div className="p-4 text-red-700 bg-red-50">
+              <AlertCircle className="w-5 h-5 inline mr-2" />
+              {error}
+            </div>
+          )}
 
-      <div className="border-t border-gray-200">
-        <dl>
-          <div className="py-5 px-4 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">Available Credits</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              <ul className="rounded-md border border-gray-200 divide-y divide-gray-200">
+          <div className="p-6">
+            {/* Available Credits Section */}
+            <div className="mb-8">
+              <h4 className="text-lg font-medium text-gray-700 mb-4">Available Credits</h4>
+              <ul className="space-y-2">
                 {isLoading ? (
                   <>
                     <LoadingCredit />
@@ -240,152 +234,163 @@ const BuyerDashboard = () => {
                     <LoadingCredit />
                   </>
                 ) : availableCredits.map((credit) => (
-                  <li key={credit.id} className="flex justify-between items-center py-3 pr-4 pl-3 text-sm">
-                    <div className="flex flex-1 items-center w-0">
-                      <span className="flex-1 ml-2 w-0 truncate">
-                        {credit.name} - Amount: {credit.amount}, Price: {credit.price} ETH
-                      </span>
+                  <li key={credit.id} className="flex justify-between items-center py-2 px-4 bg-gray-50 rounded-md">
+                    <div className="flex items-center space-x-2">
+                      <Tag className="w-4 h-4 text-emerald-500" />
+                      <span className="text-sm text-gray-700">{credit.name}</span>
+                      <span className="text-sm text-gray-500">Amount: {credit.amount}</span>
+                      <span className="text-sm text-gray-500">Price: {credit.price} ETH</span>
                     </div>
-                    <div className="flex flex-shrink-0 items-center ml-4 space-x-2">
-                      {/* Details button - added here */}
+                    <div className="flex items-center space-x-2">
                       <DetailsButton creditId={credit.id} />
-
                       {credit.secure_url && (
                         <button
-                          type="button"
                           onClick={() => window.open(credit.secure_url, '_blank')}
-                          className="py-2 px-2 text-white bg-blue-500 rounded hover:bg-blue-800"
+                          className="p-2 text-green-400 bg-white rounded-md hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors"
                         >
-                          <File size={20} />
+                          <File size={16} />
                         </button>
                       )}
                       <button
                         onClick={() => handleBuyCredit(credit.id)}
-                        className="btn btn-secondary"
                         disabled={credit.amount <= 0 || pendingTx === credit.id}
+                        className={`px-3 py-1 text-sm font-medium rounded-md flex items-center ${
+                          credit.amount > 0
+                            ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        } focus:outline-none focus:ring-2 focus:ring-emerald-300 transition-colors`}
                       >
                         {pendingTx === credit.id ? (
-                          <span className="flex items-center">
-                            <Loader2 className="mr-2 w-4 h-4 animate-spin" />
-                            Processing...
-                          </span>
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin mr-1" />
+                            Buying...
+                          </>
                         ) : (
-                          credit.amount > 0 ? 'Buy' : 'Out of Stock'
+                          <>
+                            <ShoppingCart className="w-4 h-4 mr-1" />
+                            {credit.amount > 0 ? 'Buy' : 'Out of Stock'}
+                          </>
                         )}
                       </button>
                     </div>
                   </li>
                 ))}
               </ul>
-            </dd>
-          </div>
+            </div>
 
-          <div className="py-5 px-4 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">Purchased Credits</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+            {/* Purchased Credits Section */}
+            <div>
+              <h4 className="text-lg font-medium text-gray-700 mb-4">Purchased Credits</h4>
               {purchasedCredits.length > 0 ? (
-                <ul className="rounded-md border border-gray-200 divide-y divide-gray-200">
+                <ul className="space-y-2">
                   {purchasedCredits.map((credit) => (
                     <li
                       key={credit.id}
-                      className={`pl-3 pr-4 py-3 flex items-center justify-between text-sm ${credit.is_expired ? 'bg-[#D4EDDA]' : ''}`}
+                      className={`py-2 px-4 rounded-md ${
+                        credit.is_expired ? 'bg-green-50' : 'bg-white'
+                      }`}
                     >
-                      <div className="flex flex-1 items-center w-0">
-                        <span className="flex-1 ml-2 w-0 truncate">
-                          {credit.name} - Amount: {credit.amount}, Price: {credit.price} ETH
-                        </span>
-                      </div>
-
-                      <div className="flex flex-shrink-0 gap-2 items-center ml-4">
-                        {/* Details button - added here */}
-                        <DetailsButton creditId={credit.id} />
-
-                        {/* View Project Documents button - aligned left */}
-                        {credit.secure_url && (
-                          <button
-                            type="button"
-                            onClick={() => window.open(credit.secure_url, "_blank")}
-                            className="py-1 px-3 text-white bg-gray-500 rounded hover:bg-gray-600"
-                          >
-                            View Project Documents
-                          </button>
-                        )}
-
-                        {credit.is_expired ? (
-                          <div className="flex gap-4">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center space-x-2">
+                          <Tag className="w-4 h-4 text-emerald-500" />
+                          <span className="text-sm text-gray-700">{credit.name}</span>
+                          <span className="text-sm text-gray-500">Amount: {credit.amount}</span>
+                          <span className="text-sm text-gray-500">Price: {credit.price} ETH</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <DetailsButton creditId={credit.id} />
+                          {credit.secure_url && (
                             <button
-                              onClick={() => { showCertificate ? handleGenerateCertificate(credit.id) : handleHideCertificate() }}
-                              className="btn bg-sky-500"
+                              onClick={() => window.open(credit.secure_url, '_blank')}
+                              className="p-2 text-green-400 bg-white rounded-md hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors"
                             >
-                              {showCertificate ? <Eye /> : <EyeClosed />}
+                              <File size={16} />
                             </button>
-
+                          )}
+                          {credit.is_expired ? (
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => showCertificate ? handleGenerateCertificate(credit.id) : handleHideCertificate()}
+                                className="p-2 text-emerald-500 bg-white rounded-md hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-300 transition-colors"
+                              >
+                                {showCertificate ? <Eye size={16} /> : <EyeOff size={16} />}
+                              </button>
+                              <button
+                                onClick={() => handleDownloadCertificate(credit.id)}
+                                className="p-2 text-green-400 bg-white rounded-md hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors"
+                              >
+                                <Download size={16} />
+                              </button>
+                            </div>
+                          ) : credit.is_active ? (
                             <button
-                              onClick={() => handleDownloadCertificate(credit.id)}
-                              className="btn btn-secondary"
+                              onClick={() => handleRemoveFromSale(credit.id)}
+                              className="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors"
                             >
-                              Download
+                              <XCircle className="w-4 h-4 mr-1 inline" />
+                              Remove from Sale
                             </button>
-                          </div>
-                        ) : credit.is_active ? (
-                          <button
-                            onClick={() => handleRemoveFromSale(credit.id)}
-                            className="py-1 px-3 text-white bg-red-500 rounded hover:bg-red-600"
-                          >
-                            Remove from Sale
-                          </button>
-                        ) : (
-                          <div className="flex flex-col">
-                            <button
-                              onClick={() => handleSellInput(credit.id)}
-                              className="py-1 px-3 text-white bg-blue-500 rounded hover:bg-blue-600"
-                            >
-                              Sell
-                            </button>
-                            {credit.showSellInput && (
-                              <div className="mt-2">
-                                <input
-                                  type="number"
-                                  placeholder="Enter price"
-                                  className="p-1 rounded border"
-                                  value={credit.salePrice || ''}
-                                  onChange={(e) => handlePriceChange(credit.id, e.target.value)}
-                                />
-                                <button
-                                  onClick={() => confirmSale(credit.id)}
-                                  className="py-1 px-3 ml-2 text-white bg-green-500 rounded hover:bg-green-600"
-                                >
-                                  Confirm
-                                </button>
-                                <p className="mt-1 text-sm text-gray-500">
-                                  You will get 90% of value, the other 10% will go to creator
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        )}
+                          ) : (
+                            <div className="flex flex-col space-y-2">
+                              <button
+                                onClick={() => handleSellInput(credit.id)}
+                                className="px-3 py-1 text-sm font-medium text-white bg-emerald-500 rounded-md hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300 transition-colors"
+                              >
+                                <DollarSign className="w-4 h-4 mr-1 inline" />
+                                Sell
+                              </button>
+                              {credit.showSellInput && (
+                                <div className="flex items-center space-x-2">
+                                  <input
+                                    type="number"
+                                    placeholder="Price"
+                                    className="w-24 px-2 py-1 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-300"
+                                    value={credit.salePrice || ''}
+                                    onChange={(e) => handlePriceChange(credit.id, e.target.value)}
+                                  />
+                                  <button
+                                    onClick={() => confirmSale(credit.id)}
+                                    className="px-3 py-1 text-sm font-medium text-white bg-green-400 rounded-md hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors"
+                                  >
+                                    Confirm
+                                  </button>
+                                  <p className="text-xs text-gray-500">
+                                    (90% to you, 10% to creator)
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p>No credits purchased yet.</p>
+                <p className="text-sm text-gray-500">No credits purchased yet.</p>
               )}
-            </dd>
-          </div>
+            </div>
 
-          {certificateData && (
-            <div className="py-5 px-4 mt-6 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Certificate</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+            {/* Certificate Display */}
+            {certificateData && (
+              <div className="mt-8 p-4 bg-white rounded-md shadow-sm">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="text-lg font-medium text-gray-700">Certificate</h4>
+                  <button
+                    onClick={handleHideCertificate}
+                    className="p-2 text-gray-400 hover:text-gray-500 focus:outline-none"
+                  >
+                    <XCircle size={16} />
+                  </button>
+                </div>
                 <div
-                  className="p-4 rounded-md border"
+                  className="p-4 border border-gray-200 rounded-md"
                   dangerouslySetInnerHTML={{ __html: certificateData.certificate_html }}
                 />
-              </dd>
-            </div>
-          )}
-        </dl>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

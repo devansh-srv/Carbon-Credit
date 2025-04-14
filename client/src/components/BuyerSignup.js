@@ -122,7 +122,7 @@ const BuyerSignup = ({ onLogin }) => {
                 </button>
               </div>
             </div>
-            <div>
+            <div className='justify-center ml-10'>
               <Turnstile
                 options={{
                   theme: 'light',

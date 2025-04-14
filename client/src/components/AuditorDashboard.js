@@ -2,14 +2,24 @@ import React, { useState, useEffect, useContext } from 'react';
 import { getAssignedCredits, auditCreditApi } from '../api/api';
 import { CC_Context } from "../context/SmartContractConnector.js";
 import Swal from 'sweetalert2';
+import { 
+  Shield, 
+  CheckCircle, 
+  XCircle, 
+  FileText, 
+  AlertTriangle,
+  CheckSquare,
+  ExternalLink,
+  X
+} from 'lucide-react';
 
 const LoadingCredit = () => (
-  <li className="flex justify-between items-center py-3 pr-4 pl-3 text-sm animate-pulse">
+  <li className="flex justify-between items-center py-4 pr-4 pl-3 text-sm animate-pulse">
     <div className="flex-1">
       <div className="w-3/4 h-4 bg-gray-200 rounded"></div>
     </div>
-    <div className="w-16">
-      <div className="h-8 bg-gray-200 rounded"></div>
+    <div className="w-40">
+      <div className="h-10 bg-gray-200 rounded"></div>
     </div>
   </li>
 );
@@ -93,93 +103,135 @@ const AuditorDashboard = () => {
   };
 
   return (
-    <div className="overflow-hidden bg-white bg-gradient-to-br from-blue-100 to-indigo-300 shadow sm:rounded-lg">
-      <div className="py-5 px-4 sm:px-6">
-        <h3 className="text-lg font-medium leading-6 text-gray-900">Auditor Dashboard</h3>
-        <p className="mt-1 max-w-2xl text-sm text-gray-500">Audit the credits assigned to you</p>
+    <div className="bg-gradient-to-br from-green-50 to-emerald-100 shadow-lg rounded-lg overflow-hidden">
+      <div className="py-6 px-6 bg-white border-b border-green-100">
+        <div className="flex items-center">
+          <Shield className="text-emerald-500 h-6 w-6 mr-3" />
+          <div>
+            <h3 className="text-xl font-medium text-gray-800">Auditor Dashboard</h3>
+            <p className="mt-1 text-sm text-gray-500">Review and audit credits assigned to you</p>
+          </div>
+        </div>
       </div>
 
       {error && (
-        <div className="py-3 px-4 text-red-700 bg-red-50">
-          {error}
+        <div className="py-4 px-6 flex items-center text-red-700 bg-red-50 border-b border-red-100">
+          <AlertTriangle className="h-5 w-5 mr-2 text-red-500" />
+          <span>{error}</span>
         </div>
       )}
 
-      <div className="border-t border-gray-200">
-        <dl>
-          <div className="py-5 px-4 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">Assigned Credits</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              <ul className="rounded-md border border-gray-200 divide-y divide-gray-200">
-                {isLoading ? (
-                  <>
-                    <LoadingCredit />
-                    <LoadingCredit />
-                    <LoadingCredit />
-                  </>
-                ) : AssignedCredits.map((credit) => (
-                  <li key={credit.id} className="flex justify-between items-center py-3 pr-4 pl-3 text-sm">
-                    <div className="flex flex-1 items-center w-0">
-                      <span className="flex-1 ml-2 w-0 truncate">
-                        {credit.name} - Amount: {credit.amount}, Price: {credit.price} ETH
-                      </span>
+      <div className="px-6 py-6">
+        <div className="mb-3 flex items-center">
+          <FileText className="text-emerald-500 h-5 w-5 mr-2" />
+          <h4 className="text-md font-medium text-emerald-700">Assigned Credits</h4>
+        </div>
+        
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <ul className="divide-y divide-gray-100">
+            {isLoading ? (
+              <>
+                <LoadingCredit />
+                <LoadingCredit />
+                <LoadingCredit />
+              </>
+            ) : AssignedCredits.length === 0 ? (
+              <li className="py-6 px-4 text-center text-gray-500">
+                <div className="flex flex-col items-center">
+                  <CheckSquare className="h-12 w-12 text-green-300 mb-2" />
+                  <p>No credits assigned for auditing</p>
+                </div>
+              </li>
+            ) : (
+              AssignedCredits.map((credit) => (
+                <li key={credit.id} className="px-4 py-4">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <div className="bg-green-100 rounded-full p-2">
+                        <FileText className="h-5 w-5 text-green-500" />
+                      </div>
+                      <div className="ml-3">
+                        <h5 className="text-sm font-medium text-gray-900">{credit.name}</h5>
+                        <div className="flex items-center mt-1 text-xs text-gray-500 space-x-2">
+                          <span className="flex items-center">
+                            <span className="font-medium">Amount:</span>&nbsp;{credit.amount}
+                          </span>
+                          <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                          <span className="flex items-center">
+                            <span className="font-medium">Price:</span>&nbsp;{credit.price} ETH
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-shrink-0 ml-4">
+                    
+                    <div className="flex space-x-2">
                       {credit.secure_url && (
                         <button
                           type='button'
                           onClick={() => window.open(credit.secure_url, '_blank')}
-                          className="py-2 px-4 mr-4 font-sans text-white bg-blue-500 rounded hover:bg-blue-800">
-                          View Project Documents
+                          className="py-2 px-3 text-sm text-emerald-700 bg-green-100 rounded-md hover:bg-cyan-200 inline-flex items-center transition-colors duration-200">
+                          <ExternalLink className="h-4 w-4 mr-1" />
+                          View Documents
                         </button>
                       )}
+                      
                       {auditCreditId !== credit.id && (
                         <button
                           onClick={() => handleAudit(credit.id)}
-                          className="btn btn-secondary"
+                          className="py-2 px-4 text-sm bg-emerald-500 text-white rounded-md hover:bg-emerald-600 transition-colors duration-200"
                         >
                           Audit
                         </button>
                       )}
                     </div>
+                  </div>
 
-                    {auditCreditId === credit.id && (
-                      <div className="mt-3 p-4 border rounded bg-white shadow">
-                        <h4 className="text-sm font-medium text-gray-900">Audit Credit</h4>
-                        <textarea
-                          className="w-full p-2 mt-2 border rounded"
-                          placeholder="Enter reason for audit"
-                          value={auditReason}
-                          onChange={(e) => setAuditReason(e.target.value)}
-                        ></textarea>
-                        <div className="mt-3 flex gap-2">
-                          <button 
-                            className="py-2 px-4 bg-green-500 text-white rounded hover:bg-green-400"
-                            onClick={() => handleAcceptCredit(credit.id)}
-                          >
-                            Accept Credit
-                          </button>
-                          <button 
-                            className="py-2 px-4 bg-red-500 text-white rounded hover:bg-red-400"
-                            onClick={() => handleRejectCredit(credit.id)}
-                          >
-                            Reject Credit
-                          </button>
-                          <button
-                            className="py-2 px-4 bg-gray-500 text-white rounded hover:bg-gray-400"
-                            onClick={() => setAuditCreditId(null)}
-                          >
-                            Cancel
-                          </button>
-                        </div>
+                  {auditCreditId === credit.id && (
+                    <div className="mt-4 p-5 border border-cyan-200 rounded-lg bg-white shadow-sm">
+                      <div className="flex justify-between items-center mb-3">
+                        <h4 className="text-sm font-medium text-gray-900 flex items-center">
+                          <Shield className="h-4 w-4 text-emerald-500 mr-2" />
+                          Audit Decision
+                        </h4>
+                        <button 
+                          onClick={() => setAuditCreditId(null)}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <X className="h-5 w-5" />
+                        </button>
                       </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </dd>
-          </div>
-        </dl>
+                      
+                      <textarea
+                        className="w-full p-3 border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
+                        placeholder="Enter reason for your audit decision (optional)"
+                        rows="3"
+                        value={auditReason}
+                        onChange={(e) => setAuditReason(e.target.value)}
+                      ></textarea>
+                      
+                      <div className="mt-4 flex gap-3 pl-[50%]">
+                        <button 
+                          className="flex-1 py-2 inline-flex justify-center items-center bg-green-400 text-white rounded-md hover:bg-green-500 transition-colors duration-200"
+                          onClick={() => handleAcceptCredit(credit.id)}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Accept
+                        </button>
+                        <button 
+                          className="flex-1 py-2 inline-flex justify-center items-center bg-red-400 text-white rounded-md hover:bg-red-500 transition-colors duration-200"
+                          onClick={() => handleRejectCredit(credit.id)}
+                        >
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Reject
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
       </div>
     </div>
   );
