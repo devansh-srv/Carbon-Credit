@@ -24,23 +24,23 @@ def get_current_user():
 @jwt_required()
 def buyer_credits():
     key = "buyer_credits"
-    # if redis_client:
-    #     try:
-    #         cached_credits = redis_client.get(key)
-    #         if cached_credits:
-    #             print("cache hit")
-    #             return jsonify(json.loads(cached_credits))
-    #         else:
-    #             print("cache miss")
-    #     except Exception as e:
-    #         print(f"redis get client error: {e}")
+    if redis_client:
+        try:
+            cached_credits = redis_client.get(key)
+            if cached_credits:
+                print("cache hit")
+                return jsonify(json.loads(cached_credits))
+            else:
+                print("cache miss")
+        except Exception as e:
+            print(f"redis get client error: {e}")
     credits = Credit.query.filter_by(is_active =True).all()
     data = [{"id": c.id, "name": c.name, "amount": c.amount, "price": c.price,"creator":c.creator_id, "secure_url": c.docu_url} for c in credits]
-    # if redis_client:
-    #     try:
-    #         redis_client.set(key, json.dumps(data))
-    #     except:
-    #         pass
+    if redis_client:
+        try:
+            redis_client.set(key, json.dumps(data))
+        except:
+            pass
     return jsonify(data)
 
 @buyer_bp.route('/api/buyer/purchase', methods=['POST'])

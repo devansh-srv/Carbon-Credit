@@ -32,16 +32,16 @@ def manage_credits():
     key = user.username
     # Ensure only credits created by this NGO are visible
     if request.method == 'GET':
-        # if redis_client:
-        #     try:
-        #         cached_credits = redis_client.get(key)
-        #         if cached_credits:
-        #             print("cache hit")
-        #             return jsonify(json.loads(cached_credits))
-        #         else:
-        #             print("cache miss")
-        #     except Exception as e:
-        #         print(f"redis get client error: {e}")
+        if redis_client:
+            try:
+                cached_credits = redis_client.get(key)
+                if cached_credits:
+                    print("cache hit")
+                    return jsonify(json.loads(cached_credits))
+                else:
+                    print("cache miss")
+            except Exception as e:
+                print(f"redis get client error: {e}")
         credits = Credit.query.filter_by(creator_id=user.id).order_by(Credit.id.asc()).all()
         data = []
         for c in credits:
@@ -60,7 +60,7 @@ def manage_credits():
                 "auditor_left": len(req.auditors) if req and req.auditors else 0,
                 "score": req.score if req else 0
             })
-        # redis_client.set(key, json.dumps(data),px=10000)
+        redis_client.set(key, json.dumps(data),px=10000)
         return jsonify(data), 200
 
     # Allow the NGO to create new credits
