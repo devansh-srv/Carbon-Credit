@@ -332,6 +332,15 @@ const BuyerDashboard = () => {
                             </button>
                           ) : (
                             <div className="flex flex-col space-y-2">
+                            {credit.showSellInput ? (
+                              <button
+                                onClick={() => handleSellInput(credit.id)}
+                                className="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors"
+                              >
+                                
+                                Cancel
+                              </button>
+                            ) : (
                               <button
                                 onClick={() => handleSellInput(credit.id)}
                                 className="px-3 py-1 text-sm font-medium text-white bg-emerald-500 rounded-md hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300 transition-colors"
@@ -339,27 +348,28 @@ const BuyerDashboard = () => {
                                 <DollarSign className="w-4 h-4 mr-1 inline" />
                                 Sell
                               </button>
-                              {credit.showSellInput && (
-                                <div className="flex items-center space-x-2">
-                                  <input
-                                    type="number"
-                                    placeholder="Price"
-                                    className="w-24 px-2 py-1 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-300"
-                                    value={credit.salePrice || ''}
-                                    onChange={(e) => handlePriceChange(credit.id, e.target.value)}
-                                  />
-                                  <button
-                                    onClick={() => confirmSale(credit.id)}
-                                    className="px-3 py-1 text-sm font-medium text-white bg-green-400 rounded-md hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors"
-                                  >
-                                    Confirm
-                                  </button>
-                                  <p className="text-xs text-gray-500">
-                                    (90% to you, 10% to creator)
-                                  </p>
-                                </div>
-                              )}
-                            </div>
+                            )}
+                            {credit.showSellInput && (
+                              <div className="flex items-center space-x-2">
+                                <input
+                                  type="number"
+                                  placeholder="Price"
+                                  className="w-24 px-2 py-1 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-300"
+                                  value={credit.salePrice || ''}
+                                  onChange={(e) => handlePriceChange(credit.id, e.target.value)}
+                                />
+                                <button
+                                  onClick={() => confirmSale(credit.id)}
+                                  className="px-3 py-1 text-sm font-medium text-white bg-green-400 rounded-md hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors"
+                                >
+                                  Confirm
+                                </button>
+                                <p className="text-xs text-gray-500">
+                                  (90% to you, 10% to creator)
+                                </p>
+                              </div>
+                            )}
+                          </div>
                           )}
                         </div>
                       </div>

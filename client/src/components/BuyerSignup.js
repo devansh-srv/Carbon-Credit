@@ -60,7 +60,7 @@ const BuyerSignup = ({ onLogin }) => {
     <div className="flex justify-center items-center py-12 px-4 w-full min-h-screen bg-gradient-to-br from-indigo-500 to-blue-400">
 
       {status && (
-        <div className={`flex fixed top-5 left-1/2 items-center py-2 px-4 text-white ${color} rounded-lg shadow-lg transition-transform duration-300 transform -translate-x-1/2 animate-slideIn}`} >
+        <div className={`flex fixed top-15 left-1/2 items-center py-2 px-4 text-white ${color} rounded-lg shadow-lg transition-transform duration-300 transform -translate-x-1/2 animate-slideIn}`} >
           <span>{status}</span>
         </div>
       )

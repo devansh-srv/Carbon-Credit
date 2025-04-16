@@ -218,8 +218,8 @@ const CreditDetails = () => {
             <div>
               <p className="text-sm text-gray-500">Request Status</p>
               <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                (dbCredit?.req_status === 'Approved' || credit?.requestStatus === 'Approved') ? 'bg-green-100 text-green-800' :
-                (dbCredit?.req_status === 'Pending' || credit?.requestStatus === 'Pending') ? 'bg-yellow-100 text-yellow-800' :
+                (dbCredit?.req_status === 3 ) ? 'bg-green-100 text-green-800' :
+                (dbCredit?.req_status === 2 || credit?.requestStatus === '3') ? 'bg-yellow-100 text-yellow-800' :
                 'bg-red-100 text-red-800'
               }`}>
                 {dbCredit?.req_status || credit?.requestStatus || 'Unknown'}
@@ -279,7 +279,7 @@ const CreditDetails = () => {
               rel="noopener noreferrer" 
               className="text-emerald-500 hover:text-emerald-600 font-medium truncate block"
             >
-              {dbCredit.docu_url}
+              link
             </a>
           </div>
         </div>

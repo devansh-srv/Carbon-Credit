@@ -93,11 +93,18 @@ def generate_certificate_data(purchase_id, user, purchased_credit, credit, trans
                     </p>
                     <p style="
                         padding-bottom: 15px;
+                        display: inline-block;
+                        width: 90%
+                    ">
+                        Certificate ID: CC-{purchase_id}-{user.id}-{credit.id}
+                    </p>
+                    <p style="
+                        padding-bottom: 15px;
                         border-bottom: 1px solid #bdc3c7;
                         display: inline-block;
                         width: 90%
                     ">
-                        Certificate ID: CC-{purchase_id}-{user.id}-{credit.id-1}
+                        Credit ID: CC-{credit.id}
                     </p>
                 </div>
             </div>

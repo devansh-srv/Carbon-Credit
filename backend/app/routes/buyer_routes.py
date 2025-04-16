@@ -24,23 +24,23 @@ def get_current_user():
 @jwt_required()
 def buyer_credits():
     key = "buyer_credits"
-    if redis_client:
-        try:
-            cached_credits = redis_client.get(key)
-            if cached_credits:
-                print("cache hit")
-                return jsonify(json.loads(cached_credits))
-            else:
-                print("cache miss")
-        except Exception as e:
-            print(f"redis get client error: {e}")
+    # if redis_client:
+    #     try:
+    #         cached_credits = redis_client.get(key)
+    #         if cached_credits:
+    #             print("cache hit")
+    #             return jsonify(json.loads(cached_credits))
+    #         else:
+    #             print("cache miss")
+    #     except Exception as e:
+    #         print(f"redis get client error: {e}")
     credits = Credit.query.filter_by(is_active =True).all()
     data = [{"id": c.id, "name": c.name, "amount": c.amount, "price": c.price,"creator":c.creator_id, "secure_url": c.docu_url} for c in credits]
-    if redis_client:
-        try:
-            redis_client.set(key, json.dumps(data))
-        except:
-            pass
+    # if redis_client:
+    #     try:
+    #         redis_client.set(key, json.dumps(data))
+    #     except:
+    #         pass
     return jsonify(data)
 
 @buyer_bp.route('/api/buyer/purchase', methods=['POST'])
@@ -211,9 +211,9 @@ def generate_certificate(creditId):
     if credit is None:
         return jsonify({"message":"No such credit found"}),404
 
-    transaction = Transactions.query.get(purchased_credit.credit_id)
+    transaction = Transactions.query.filter_by(credit_id=purchased_credit.credit_id).order_by(Transactions.timestamp.desc()).first()
     if transaction is None:
-        return jsonify({"message": "Respective transaction not found"}), 404
+        return jsonify({"message": f"Respective transaction with {purchased_credit.credit_id} not found"}), 404
     
     certificate_data = generate_certificate_data(purchased_credit.id, user, purchased_credit, credit, transaction) if credit.is_expired else None
     if certificate_data is None:
@@ -235,7 +235,7 @@ def download_certificate(creditId):
     credit = Credit.query.get(purchased_credit.credit_id)
     if credit is None:
         return jsonify({"message":"No such credit found"}),404
-    transaction = Transactions.query.get(purchased_credit.credit_id)
+    transaction = Transactions.query.filter_by(credit_id=purchased_credit.credit_id).order_by(Transactions.timestamp.desc()).first()
     if transaction is None:
         return jsonify({"message": "Respective transaction not found"}), 404
     # creator = User.query.get(purchased_credit.creator_id) if purchased_credit.creator_id else None

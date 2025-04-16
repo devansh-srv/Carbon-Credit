@@ -203,7 +203,7 @@ const AuditorDashboard = () => {
                       
                       <textarea
                         className="w-full p-3 border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
-                        placeholder="Enter reason for your audit decision (optional)"
+                        placeholder="Enter reason for your audit decision"
                         rows="3"
                         value={auditReason}
                         onChange={(e) => setAuditReason(e.target.value)}
