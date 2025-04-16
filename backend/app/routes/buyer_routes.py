@@ -28,10 +28,10 @@ def buyer_credits():
         try:
             cached_credits = redis_client.get(key)
             if cached_credits:
-                print("cache hit")
+                print("cache hit buyer_credits")
                 return jsonify(json.loads(cached_credits))
             else:
-                print("cache miss")
+                print("cache miss buyer_credits")
         except Exception as e:
             print(f"redis get client error: {e}")
     credits = Credit.query.filter_by(is_active =True).all()
@@ -39,6 +39,7 @@ def buyer_credits():
     if redis_client:
         try:
             redis_client.set(key, json.dumps(data))
+            print("buyer_credits cached")
         except:
             pass
     return jsonify(data)
@@ -191,6 +192,7 @@ def get_purchased_credits():
         if redis_client:
             try:
                 redis_client.set(key,json.dumps(credits),ex=1)
+                print("puchased cached")
             except:
                 pass
     return jsonify(credits), 200

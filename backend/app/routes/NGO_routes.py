@@ -36,10 +36,12 @@ def manage_credits():
             try:
                 cached_credits = redis_client.get(key)
                 if cached_credits:
-                    print("cache hit")
+                    print("cache hit credit")
+                    print(f"key: {key}")
                     return jsonify(json.loads(cached_credits))
                 else:
-                    print("cache miss")
+                    print("cache miss credit")
+                    print(f"key: {key}")
             except Exception as e:
                 print(f"redis get client error: {e}")
         credits = Credit.query.filter_by(creator_id=user.id).order_by(Credit.id.asc()).all()
@@ -68,8 +70,10 @@ def manage_credits():
         
         if redis_client:
             try:
-                cached_credits = redis_client.get(key)
+                # cached_credits = redis_client.get(key)
                 redis_client.delete(key)
+                print("cache credit delete")
+                print(f"key: {key}")
             except:
                 pass
         #do something regarding the amount 

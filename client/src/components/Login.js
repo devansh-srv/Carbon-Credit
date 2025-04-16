@@ -58,7 +58,9 @@ const Login = ({ onLogin }) => {
     <>
       <div className="flex justify-center items-center py-12 px-4 w-full min-h-screen bg-gradient-to-br from-emerald-100 to-blue-200">
         {status && (
+
           <div className="flex fixed top-20 left-1/2 items-center py-2 px-4 text-white bg-red-500 rounded-lg shadow-lg transition-transform duration-300 transform -translate-x-1/2 animate-slideIn">
+
             <span>{status}</span>
           </div>
         )}

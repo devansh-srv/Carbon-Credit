@@ -8,7 +8,7 @@ from app.models.user import User
 from app.utilis.redis import get_redis
 import json
 auditor_bp = Blueprint('auditor', __name__)
-# redis_client = get_redis()
+redis_client = get_redis()
 def get_current_user():
     try:
         return json.loads(get_jwt_identity())
@@ -52,6 +52,17 @@ def audit_credit(credit_id):
     # print("credit id", credit_id)
     user = User.query.filter_by(username=current_user.get('username')).first()
     request_obj = Request.query.filter_by(credit_id=credit_id).first()
+    cid = request_obj.creator_id
+    print(f"creator_id: {cid}")
+    cu_ngo = User.query.filter_by(id =cid).first()
+    key = cu_ngo.username
+    print(f"key: {key}")
+    if redis_client:
+        try:
+            redis_client.delete(key)
+            print("deleted cached credits")
+        except:
+            pass
 
     if not request_obj or user.id not in request_obj.auditors:
         return jsonify({"message": "Not assigned or already audited"}), 404
