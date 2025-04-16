@@ -26,7 +26,7 @@ const Home = () => {
             Transparent, secure, and accessible carbon credit trading powered by Ethereum (Sepolia Testnet). 
             Empower your sustainability efforts with verifiable, tradable carbon credits.
             <br/>
-            View contract on <a href='https://sepolia.etherscan.io/address/0x5E5D1D1Dc0EDDB4f9e9E05FD872642Cd78F6eF51'
+            View contract on <a href='https://sepolia.etherscan.io/address/0x15Ef15a50a2F72126EBcDC6989044Ce6ae322802'
               class=" text-green-600 hover:text-blue-800" target="_blank" >
                 Etherscan
                 </a> 
