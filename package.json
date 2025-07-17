@@ -1,0 +1,14 @@
+{
+  "name": "carbon-credit-platform",
+  "version": "1.0.0",
+  "description": "Blockchain-based Carbon Credit Trading Platform",
+  "scripts": {
+    "analyze:dead-code": "./analyze-dead-code.sh",
+    "analyze:frontend": "cd client && npm run analyze:dead-code",
+    "analyze:backend": "cd backend && python3 analyze-dead-code.py",
+    "analyze:contracts": "cd smartContracts && node analyze-dead-code.js"
+  },
+  "keywords": ["blockchain", "carbon-credit", "solidity", "react", "flask"],
+  "author": "Carbon Credit Team",
+  "license": "MIT"
+}

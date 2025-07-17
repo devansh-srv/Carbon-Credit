@@ -2,3 +2,9 @@ bin/
 ignition/deployments/
 artifacts/
 cache/
+
+# Dead code analysis reports
+dead-code-reports/
+client/reports/
+backend/reports/
+smartContracts/reports/
