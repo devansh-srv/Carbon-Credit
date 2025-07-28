@@ -10,3 +10,6 @@ gunicorn==19.7.1
 requests
 redis
 flask-migrate
+vulture
+unimport
+pyflakes
